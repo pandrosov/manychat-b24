@@ -25,7 +25,7 @@ contactRoute.post('/add', async (req: RequestWithBody<BitrixContact>, res: Respo
 
         res.status(HttpCodes.CREATED).send({result: response})
     } catch(error) {
-        res.sendStatus(404)
+        res.status(404).send({error: error})
     }
 })
 contactRoute.post('/update', (req: Request, res: Response) => {
