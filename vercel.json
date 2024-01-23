@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "manychat-b24-integration",
+  "builds": [
+    {"src":  "src/index.ts", "use":  "@vercel/node"}
+  ],
+  "routes": [
+    {"src": "/(.*)", "dest": "src/index.ts"}
+  ]
+}
