@@ -39,8 +39,8 @@ export class Bitrix24 {
     async createLead(leadData: LeadRequest): Promise<number> {
         try {
             const {records, phone, fullname, email} = leadData.data
-            const comments = records.filter(i => i.idx === '5')
-            const region = records.filter(i => i.idx === '6')
+            const comments = records.find(i => i.idx === '5')?.value || ''
+            const region = records.find(i => i.idx === '6')?.value || ''
             const response = await axios.post(`${this.webhookUrlProd}crm.lead.add`, {fields: {
                 NAME: fullname,
                 EMAIL: [
@@ -58,7 +58,7 @@ export class Bitrix24 {
                     }
                 ],
                 TITLE: 'TapLink Lead',
-                COMMENTS: comments[0].value + '</br> Регион ' + region[0].value,
+                COMMENTS: comments  + '</br> Регион ' + region,
                 ASSIGNED_BY_ID: 26733
             }})
             console.log(response)
