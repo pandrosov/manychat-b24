@@ -1,6 +1,6 @@
 import {Router, Request, Response} from "express";
 import {HttpCodes, RequestWithBody} from "../../types/common";
-import {BitrixContact, LeadData} from "../../types/bitrix/input/input";
+import {BitrixContact} from "../../types/bitrix/input/input";
 import {Bitrix24} from "../../services/bitrixService";
 
 export const contactRoute = Router({})

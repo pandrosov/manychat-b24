@@ -20,14 +20,18 @@ export interface DealData {
     PHONE?: string;
 }
 
-export interface LeadData {
+export interface LeadRequest {
+    data: LeadData;
+}
+
+interface LeadData {
     records: RecordEntry[];
     email: string;
     phone: string;
     fullname: string;
 }
 
-interface RecordEntry {
+export interface RecordEntry {
     type: string;
     value: string;
     idx: string;

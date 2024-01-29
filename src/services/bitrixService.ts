@@ -1,7 +1,8 @@
 import axios, {AxiosResponse} from 'axios';
 import {BitrixRelation} from "../types/bitrix/common";
 import {BitrixResponse} from "../types/bitrix/output/bitrix-response";
-import {ContactData, LeadData} from "../types/bitrix/input/input";
+import {ContactData, LeadRequest} from "../types/bitrix/input/input";
+import e from "express";
 
 export class Bitrix24 {
     private readonly webhookUrl: string;
@@ -35,14 +36,32 @@ export class Bitrix24 {
         }
     }
 
-    async createLead(leadData: LeadData): Promise<number> {
+    async createLead(leadData: LeadRequest): Promise<number> {
         try {
-            const {records, phone, fullname, email} = leadData
-            const response:AxiosResponse<BitrixResponse, any> = await axios.post(`${this.webhookUrl}crm.lead.add`, {
+            const {records, phone, fullname, email} = leadData.data
+            const comments = records.filter(i => i.idx === '5')
+            const region = records.filter(i => i.idx === '6')
+            const response = await axios.post(`${this.webhookUrlProd}crm.lead.add`, {fields: {
                 NAME: fullname,
-                EMAIL: email,
-                TITLE: 'Tap link lead'
-            })
+                EMAIL: [
+                    {
+                        VALUE_TYPE: "WORK",
+                        VALUE: email,
+                        TYPE_ID: "EMAIL"
+                    }
+                ],
+                PHONE: [
+                    {
+                        VALUE_TYPE: "WORK",
+                        VALUE: '+' + phone,
+                        TYPE_ID: "PHONE"
+                    }
+                ],
+                TITLE: 'TapLink Lead',
+                COMMENTS: comments[0].value + '</br> Регион ' + region[0].value,
+                ASSIGNED_BY_ID: 26733
+            }})
+            console.log(response)
             return response.data.result
         } catch (error) {
             console.error('Error during create lead: ', error)
