@@ -1,12 +1,15 @@
 import axios, {AxiosResponse} from 'axios';
-import {ContactData} from "../types/bitrix/common";
+import {BitrixRelation} from "../types/bitrix/common";
 import {BitrixResponse} from "../types/bitrix/output/bitrix-response";
+import {ContactData, LeadData} from "../types/bitrix/input/input";
 
 export class Bitrix24 {
-    private webhookUrl: string;
+    private readonly webhookUrl: string;
+    private readonly webhookUrlProd: string;
 
     constructor() {
         this.webhookUrl = process.env.BITRIX_WEBHOOK_URL || '';
+        this.webhookUrlProd = process.env.BITRIX_WEBHOOK_URL_PROD || '';
         if (!this.webhookUrl) {
             throw new Error('Bitrix webhook URL not provided in environment variables');
         }
@@ -14,7 +17,6 @@ export class Bitrix24 {
 
     async createContact(contactData: ContactData): Promise<number> {
         try {
-            console.log(process.env.BITRIX_WEBHOOK_URL)
             const response:AxiosResponse<BitrixResponse, any> = await axios.post(`${this.webhookUrl}crm.contact.add`, { fields: contactData });
             return response.data.result
         } catch (error) {
@@ -29,6 +31,21 @@ export class Bitrix24 {
             console.log('Contact updated:', response);
         } catch (error) {
             console.error('Error updating contact:', error);
+            throw error;
+        }
+    }
+
+    async createLead(leadData: LeadData): Promise<number> {
+        try {
+            const {records, phone, fullname, email} = leadData
+            const response:AxiosResponse<BitrixResponse, any> = await axios.post(`${this.webhookUrl}crm.lead.add`, {
+                NAME: fullname,
+                EMAIL: email,
+                TITLE: 'Tap link lead'
+            })
+            return response.data.result
+        } catch (error) {
+            console.error('Error during create lead: ', error)
             throw error;
         }
     }

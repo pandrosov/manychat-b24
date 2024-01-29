@@ -1,6 +1,6 @@
 import {Router, Request, Response} from "express";
 import {HttpCodes, RequestWithBody} from "../../types/common";
-import {BitrixContact, BitrixRelation} from "../../types/bitrix/common";
+import {BitrixContact, LeadData} from "../../types/bitrix/input/input";
 import {Bitrix24} from "../../services/bitrixService";
 
 export const contactRoute = Router({})
@@ -28,6 +28,7 @@ contactRoute.post('/add', async (req: RequestWithBody<BitrixContact>, res: Respo
         res.status(404).send({error: error})
     }
 })
+
 contactRoute.post('/update', (req: Request, res: Response) => {
     res.sendStatus(200)
 })

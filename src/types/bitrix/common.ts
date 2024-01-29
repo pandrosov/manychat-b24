@@ -12,24 +12,5 @@ export enum BitrixRelation {
     DEAL_CONTACT_ID = ""
 }
 
-export type BitrixContact = {
-    fio: string,
-    phone: string,
-    address: string,
-    socials: string,
-    card_number?: string
-}
-
-export interface ContactData {
-    NAME: string;
-    LAST_NAME: string;
-    EMAIL?: string;
-    PHONE?: string;
-}
-
-export interface DealData {
-    NAME: string;
-    LAST_NAME: string;
-    EMAIL?: string;
-    PHONE?: string;
+export class BitrixContact {
 }
