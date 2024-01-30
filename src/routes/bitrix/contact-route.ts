@@ -1,31 +1,29 @@
 import {Router, Request, Response} from "express";
 import {HttpCodes, RequestWithBody} from "../../types/common";
-import {BitrixContact} from "../../types/bitrix/input/input";
+import {ManychatUserData} from "../../types/bitrix/input/input";
 import {Bitrix24} from "../../services/bitrixService";
+import {type} from "os";
 
 export const contactRoute = Router({})
 
-contactRoute.get('/', (req: Request, res: Response) => {
-    // res.sendStatus(200)
-    res.status(200).send({"hello": "world"})
-})
+// contactRoute.get('/', (req: Request, res: Response) => {
+//     // res.sendStatus(200)
+//     res.status(200).send({"hello": "world"})
+// })
 
-contactRoute.post('/add', async (req: RequestWithBody<BitrixContact>, res: Response) => {
+contactRoute.post('/add', async (req: RequestWithBody<ManychatUserData>, res: Response) => {
     try {
-        const {
-            fio,
-            phone,
-            address,
-            socials,
-            card_number
-        } = req.body
-
         const bitrix = new Bitrix24()
-        const response = await bitrix.createContact({NAME: fio, LAST_NAME: phone})
+        const response = await bitrix.createContact(req.body)
 
-        res.status(HttpCodes.CREATED).send({result: response})
+        if(response !== 0) {
+            res.status(HttpCodes.CREATED).send({response})
+        } else {
+            res.status(HttpCodes.BAD_REQUEST).send({response})
+        }
+
     } catch(error) {
-        res.status(404).send({error: error})
+        res.status(HttpCodes.BAD_REQUEST).send({error: error})
     }
 })
 

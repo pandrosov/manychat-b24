@@ -30,3 +30,7 @@ export enum RouterPaths {
     blogs = 'contact',
     posts = 'deal'
 }
+
+export interface Mapping {
+    [key: string]: string | undefined
+}

@@ -1,8 +1,9 @@
 import axios, {AxiosResponse} from 'axios';
 import {BitrixRelation} from "../types/bitrix/common";
 import {BitrixResponse} from "../types/bitrix/output/bitrix-response";
-import {ContactData, LeadRequest} from "../types/bitrix/input/input";
+import {LeadRequest, ManychatUserData} from "../types/bitrix/input/input";
 import e from "express";
+import {bitrixContactConvert, bitrixLeadConvert} from "../helpers/bitrix-convert";
 
 export class Bitrix24 {
     private readonly webhookUrl: string;
@@ -16,9 +17,12 @@ export class Bitrix24 {
         }
     }
 
-    async createContact(contactData: ContactData): Promise<number> {
+    async createContact(contactData: ManychatUserData): Promise<number> {
         try {
-            const response:AxiosResponse<BitrixResponse, any> = await axios.post(`${this.webhookUrl}crm.contact.add`, { fields: contactData });
+            const userData = bitrixContactConvert(contactData)
+            console.log(userData)
+            const response:AxiosResponse<BitrixResponse, any> = await axios.post(`${this.webhookUrlProd}crm.contact.add`, { fields: userData });
+
             return response.data.result
         } catch (error) {
             console.error('Error creating contact:', error);
@@ -26,7 +30,7 @@ export class Bitrix24 {
         }
     }
 
-    async updateContact(contactId: number, updateData: ContactData): Promise<void> {
+    async updateContact(contactId: number, updateData: ManychatUserData): Promise<void> {
         try {
             const response = await axios.post(`${this.webhookUrl}crm.contact.update`, { id: contactId, fields: updateData });
             console.log('Contact updated:', response);
@@ -38,30 +42,9 @@ export class Bitrix24 {
 
     async createLead(leadData: LeadRequest): Promise<number> {
         try {
-            const {records, phone, fullname, email} = leadData.data
-            const comments = records.find(i => i.idx === '5')?.value || ''
-            const region = records.find(i => i.idx === '6')?.value || ''
-            const response = await axios.post(`${this.webhookUrlProd}crm.lead.add`, {fields: {
-                NAME: fullname,
-                EMAIL: [
-                    {
-                        VALUE_TYPE: "WORK",
-                        VALUE: email,
-                        TYPE_ID: "EMAIL"
-                    }
-                ],
-                PHONE: [
-                    {
-                        VALUE_TYPE: "WORK",
-                        VALUE: '+' + phone,
-                        TYPE_ID: "PHONE"
-                    }
-                ],
-                TITLE: 'TapLink Lead',
-                COMMENTS: comments  + '</br> Регион ' + region,
-                ASSIGNED_BY_ID: 26733
-            }})
-            console.log(response)
+            const convertedLeadData = bitrixLeadConvert(leadData)
+
+            const response = await axios.post(`${this.webhookUrlProd}crm.lead.add`, {fields: convertedLeadData})
             return response.data.result
         } catch (error) {
             console.error('Error during create lead: ', error)
@@ -69,7 +52,7 @@ export class Bitrix24 {
         }
     }
 
-    async createDeal(contactId: number, updateData: ContactData): Promise<void> {
+    async createDeal(contactId: number, updateData: ManychatUserData): Promise<void> {
         try {
             const response = await axios.post(`${this.webhookUrl}crm.deal.create`, { id: contactId, fields: updateData });
             console.log('Contact updated:', response);
@@ -79,7 +62,7 @@ export class Bitrix24 {
         }
     }
 
-    async updateDeal(contactId: number, updateData: ContactData): Promise<void> {
+    async updateDeal(contactId: number, updateData: ManychatUserData): Promise<void> {
         try {
             const response = await axios.post(`${this.webhookUrl}crm.deal.update`, { id: contactId, fields: updateData });
             console.log('Contact updated:', response);
