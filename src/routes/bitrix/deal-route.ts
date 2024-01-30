@@ -12,19 +12,6 @@ dealRouter.post('/test', (req:Request, res:Response) => {
                     "type": "text",
                     "text": "simple text"
                 }
-            ],
-            "actions": [  //optional
-                {
-                    "action": "add_tag",
-                    "tag_name": "example tag"
-                },
-            ],
-            "quick_replies": [ //optional
-                {
-                    "type": "node",
-                    "caption": "Quick reply text",
-                    "target": "My Content"
-                }
             ]
         }
     })
