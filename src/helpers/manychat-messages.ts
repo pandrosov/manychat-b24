@@ -1,7 +1,7 @@
 import {IAction, IManychatMessage, IQuickReply} from "../types/manychat/input/input";
 
 export class MessageBuilder {
-    private message: IManychatMessage;
+    public message: IManychatMessage;
 
     constructor() {
         this.message = {
