@@ -21,7 +21,7 @@ contactRoute.post('/add', async (req: RequestWithBody<ManychatUserData>, res: Re
             const builder = new MessageBuilder();
             const messageJson = builder
                 .addTextMessage("Привет, это тестовое сообщение!")
-            res.status(HTTP_CODES_RESPONSE.CREATED).send({contact_id: messageJson})
+            res.status(HTTP_CODES_RESPONSE.CREATED).send(messageJson)
         } else {
             res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({contact_id: response})
         }
