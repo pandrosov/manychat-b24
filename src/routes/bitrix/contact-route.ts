@@ -1,7 +1,7 @@
 import {Router, Request, Response} from "express";
-import {HttpCodes, RequestWithBody} from "../../types/common";
+import {HTTP_CODES_RESPONSE, RequestWithBody} from "../../types/common";
 import {ManychatUserData} from "../../types/bitrix/input/input";
-import {Bitrix24} from "../../services/bitrixService";
+import {Bitrix24} from "../../services/bitrix-service";
 import {type} from "os";
 
 export const contactRoute = Router({})
@@ -13,17 +13,17 @@ export const contactRoute = Router({})
 
 contactRoute.post('/add', async (req: RequestWithBody<ManychatUserData>, res: Response) => {
     try {
-        const bitrix = new Bitrix24()
-        const response = await bitrix.createContact(req.body)
+        const bitrixService = new Bitrix24()
+        const response = await bitrixService.createContact(req.body)
 
         if(response !== 0) {
-            res.status(HttpCodes.CREATED).send({response})
+            res.status(HTTP_CODES_RESPONSE.CREATED).send({contact_id: response})
         } else {
-            res.status(HttpCodes.BAD_REQUEST).send({response})
+            res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({contact_id: response})
         }
 
     } catch(error) {
-        res.status(HttpCodes.BAD_REQUEST).send({error: error})
+        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({error: error})
     }
 })
 

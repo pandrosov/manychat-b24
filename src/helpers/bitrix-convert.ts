@@ -1,7 +1,6 @@
-import {LeadRequest, ManychatUserData} from "../types/bitrix/input/input";
-import {BitrixContact, BitrixMultiplyField, BitrixRelation} from "../types/bitrix/common";
+import {LeadRequest, ManychatDealData, ManychatUserData} from "../types/bitrix/input/input";
+import {BitrixMultiplyField, BitrixRelation} from "../types/bitrix/common";
 import {Mapping} from "../types/common";
-import {match} from "assert";
 
 const SOCIAL_TYPE = {
     INSTAGRAM: "INSTAGRAM",
@@ -18,7 +17,10 @@ const bitrixValues: Mapping = {
 
 const BITRIX_CONST = {
     CONTACT_TYPE: "UC_2HCWL8",
-    ASSIGNED_BY_ID: 26355,
+    CONTACT_ASSIGNED: 26355,
+    DEAL_ASSIGNED: 26355,
+    DEAL_TYPE: 1,
+    DEAL_CATEGORY: 35
 }
 
 const extractInstUsername = (url: string): string => {
@@ -92,7 +94,7 @@ export const bitrixContactConvert = (inputData: ManychatUserData): any => {
         [BitrixRelation.CONTACT_SOCIALS]: socials,
         [BitrixRelation.CONTACT_CARD_NUMBER]: profile_card,
         [BitrixRelation.CONTACT_TELEGRAM_ID]: telegramId,
-        [BitrixRelation.CONTACT_ASSIGNED_ID]: BITRIX_CONST.ASSIGNED_BY_ID
+        [BitrixRelation.CONTACT_ASSIGNED_ID]: BITRIX_CONST.CONTACT_ASSIGNED
     };
 };
 
@@ -121,5 +123,29 @@ export const bitrixLeadConvert = (leadData: LeadRequest):any => {
         [BitrixRelation.LEAD_TITLE]: 'TapLink Lead',
         [BitrixRelation.LEAD_COMMENTS]: comments  + '</br> Регион ' + region,
         [BitrixRelation.LEAD_ASSIGNED_BY_ID]: 26733
+    }
+}
+
+export const bitrixDealConvert = (dealData:ManychatDealData) : any => {
+    const {
+        bitrix_id,
+        post_id,
+        delivery,
+        payment,
+        cost,
+        currency,
+        products
+    } = dealData
+
+    return {
+        [BitrixRelation.DEAL_TITLE]: post_id,
+        [BitrixRelation.DEAL_CATEGORY_ID]: BITRIX_CONST.DEAL_CATEGORY,
+        [BitrixRelation.DEAL_TYPE_ID]: BITRIX_CONST.DEAL_TYPE,
+        [BitrixRelation.DEAL_CONTACT_ID]: bitrix_id,
+        [BitrixRelation.DEAL_DELIVERY]: delivery,
+        [BitrixRelation.DEAL_PAYMENT]: payment,
+        [BitrixRelation.DEAL_COST]: cost,
+        [BitrixRelation.DEAL_CURRENCY]: currency,
+        [BitrixRelation.DEAL_ASSIGNED_BY_ID]: BITRIX_CONST.DEAL_ASSIGNED
     }
 }

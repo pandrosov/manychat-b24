@@ -17,18 +17,13 @@ export type ErrorMessageType = {
     message: string
 }
 
-export enum HttpCodes {
+export enum HTTP_CODES_RESPONSE {
     SUCCESS = 200,
     CREATED = 201,
     NO_CONTENT = 204,
     NOT_FOUND = 404,
     BAD_REQUEST = 400,
     NO_AUTH = 401
-}
-
-export enum RouterPaths {
-    blogs = 'contact',
-    posts = 'deal'
 }
 
 export interface Mapping {

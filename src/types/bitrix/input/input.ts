@@ -28,6 +28,16 @@ export interface ManychatUserData {
     custom_fields: CustomFields;
 }
 
+export interface ManychatDealData {
+    bitrix_id: number,
+    post_id: string,
+    delivery: boolean,
+    payment: boolean,
+    cost: string,
+    currency: string,
+    products: string
+}
+
 interface CustomFields {
     bitrix_id: string | null;
     bitrix_user_category: string;

@@ -1,7 +1,7 @@
 import {Router, Request, Response} from "express";
-import {HttpCodes, RequestWithBody} from "../../types/common";
+import {HTTP_CODES_RESPONSE, RequestWithBody} from "../../types/common";
 import {LeadRequest} from "../../types/bitrix/input/input";
-import {Bitrix24} from "../../services/bitrixService";
+import {Bitrix24} from "../../services/bitrix-service";
 
 export const leadRoute = Router({})
 
@@ -11,9 +11,9 @@ leadRoute.post('/add', async (req: RequestWithBody<LeadRequest>, res: Response)=
         const leadResponse = await bitrix.createLead(req.body)
 
         if(leadResponse) {
-            res.status(HttpCodes.CREATED).send({result: leadResponse})
+            res.status(HTTP_CODES_RESPONSE.CREATED).send({result: leadResponse})
         }
     } catch (error) {
-        res.status(HttpCodes.BAD_REQUEST).send({error})
+        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({error})
     }
 })
