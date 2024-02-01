@@ -3,6 +3,7 @@ import {HTTP_CODES_RESPONSE, RequestWithBody} from "../../types/common";
 import {ManychatUserData} from "../../types/bitrix/input/input";
 import {Bitrix24} from "../../services/bitrix-service";
 import {type} from "os";
+import {MessageBuilder} from "../../helpers/manychat-messages";
 
 export const contactRoute = Router({})
 
@@ -17,7 +18,10 @@ contactRoute.post('/add', async (req: RequestWithBody<ManychatUserData>, res: Re
         const response = await bitrixService.createContact(req.body)
 
         if(response !== 0) {
-            res.status(HTTP_CODES_RESPONSE.CREATED).send({contact_id: response})
+            const builder = new MessageBuilder();
+            const messageJson = builder
+                .addTextMessage("Привет, это тестовое сообщение!")
+            res.status(HTTP_CODES_RESPONSE.CREATED).send({contact_id: messageJson})
         } else {
             res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({contact_id: response})
         }

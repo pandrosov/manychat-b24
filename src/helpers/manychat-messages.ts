@@ -1,6 +1,6 @@
 import {IAction, IManychatMessage, IQuickReply} from "../types/manychat/input/input";
 
-class MessageBuilder {
+export class MessageBuilder {
     private message: IManychatMessage;
 
     constructor() {
