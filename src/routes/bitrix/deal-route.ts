@@ -32,11 +32,6 @@ dealRouter.post('/add', async (req: RequestWithBody<ManychatDealData>, res: Resp
             const builder = new MessageBuilder();
             const messageJson = builder
                 .addTextMessage("Привет, это тестовое сообщение!")
-                .addAction({
-                    action: "set_field_value",
-                    field_name: "bitrix_user_id",
-                    value: [deal]
-                })
             res.status(HTTP_CODES_RESPONSE.CREATED).send({...messageJson.message})
         }
     } catch (error) {

@@ -6,7 +6,7 @@ export interface IMessage {
 export interface IAction {
     action: string,
     field_name: string,
-    value: string | number | array
+    value: string | number | Array<number>
 }
 
 export interface IQuickReply {
