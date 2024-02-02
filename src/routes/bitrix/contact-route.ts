@@ -21,6 +21,11 @@ contactRoute.post('/add', async (req: RequestWithBody<ManychatUserData>, res: Re
             const builder = new MessageBuilder();
             const messageJson = builder
                 .addTextMessage("Привет, это тестовое сообщение!")
+                .addAction({
+                    action: "set_field_value",
+                    field_name: "bitrix_user_id",
+                    value: response
+                })
             res.status(HTTP_CODES_RESPONSE.CREATED).send({...messageJson.message})
         } else {
             res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({contact_id: response})
