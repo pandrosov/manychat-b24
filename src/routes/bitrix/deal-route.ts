@@ -3,6 +3,7 @@ import {HTTP_CODES_RESPONSE, RequestWithBody} from "../../types/common";
 import {ManychatDealData} from "../../types/bitrix/input/input";
 import {Bitrix24} from "../../services/bitrix-service";
 import ManychatService from "../../services/manychat-service";
+import {MessageBuilder} from "../../helpers/manychat-messages";
 
 export const dealRouter = Router({})
 
@@ -28,18 +29,15 @@ dealRouter.post('/add', async (req: RequestWithBody<ManychatDealData>, res: Resp
         const deal = await bitrixService.createDeal(req.body)
         console.log(deal)
         if(deal) {
-            res.status(HTTP_CODES_RESPONSE.CREATED).send({
-                version: "v2",
-                type: "telegram",
-                content: {
-                    messages: [
-                        {
-                            "type": "text",
-                            "text": "Спасибо, желаем успехов"
-                        },
-                    ],
-                }
-            })
+            const builder = new MessageBuilder();
+            const messageJson = builder
+                .addTextMessage("Привет, это тестовое сообщение!")
+                .addAction({
+                    action: "set_field_value",
+                    field_name: "bitrix_user_id",
+                    value: [deal]
+                })
+            res.status(HTTP_CODES_RESPONSE.CREATED).send({...messageJson.message})
         }
     } catch (error) {
         res.status(HTTP_CODES_RESPONSE.BAD_REQUEST)
