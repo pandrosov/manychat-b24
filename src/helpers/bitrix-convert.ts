@@ -1,6 +1,7 @@
 import {LeadRequest, ManychatDealData, ManychatUserData} from "../types/bitrix/input/input";
 import {BitrixMultiplyField, BitrixRelation} from "../types/bitrix/common";
 import {Mapping} from "../types/common";
+import {Bitrix24} from "../services/bitrix-service";
 
 const SOCIAL_TYPE = {
     INSTAGRAM: "INSTAGRAM",
@@ -29,11 +30,11 @@ const extractInstUsername = (url: string): string => {
 
 export const bitrixContactConvert = (inputData: ManychatUserData): any => {
     const telegramId = inputData.id
+    const profile_phone = inputData.phone
     const {
         profile_name,
         profile_socials,
         profile_address,
-        profile_phone,
         profile_card,
         bitrix_user_category ,
         bitrix_user_region
@@ -116,7 +117,7 @@ export const bitrixLeadConvert = (leadData: LeadRequest):any => {
         [BitrixRelation.LEAD_PHONE]: [
             {
                 VALUE_TYPE: "WORK",
-                VALUE: email,
+                VALUE: phone,
                 TYPE_ID: "PHONE"
             }
         ],
@@ -129,6 +130,7 @@ export const bitrixLeadConvert = (leadData: LeadRequest):any => {
 export const bitrixDealConvert = (dealData:ManychatDealData) : any => {
     const {
         bitrix_id,
+        profile_name,
         post_id,
         delivery,
         payment,
@@ -138,7 +140,7 @@ export const bitrixDealConvert = (dealData:ManychatDealData) : any => {
     } = dealData
 
     return {
-        [BitrixRelation.DEAL_TITLE]: post_id,
+        [BitrixRelation.DEAL_TITLE]: profile_name + "Пост: " + post_id,
         [BitrixRelation.DEAL_CATEGORY_ID]: BITRIX_CONST.DEAL_CATEGORY,
         [BitrixRelation.DEAL_TYPE_ID]: BITRIX_CONST.DEAL_TYPE,
         [BitrixRelation.DEAL_CONTACT_ID]: bitrix_id,
@@ -146,6 +148,7 @@ export const bitrixDealConvert = (dealData:ManychatDealData) : any => {
         [BitrixRelation.DEAL_PAYMENT]: payment,
         [BitrixRelation.DEAL_COST]: cost,
         [BitrixRelation.DEAL_CURRENCY]: currency,
+        [BitrixRelation.DEAL_POST_ID]: post_id,
         [BitrixRelation.DEAL_ASSIGNED_BY_ID]: BITRIX_CONST.DEAL_ASSIGNED
     }
 }

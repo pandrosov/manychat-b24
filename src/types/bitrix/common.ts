@@ -26,6 +26,7 @@ export enum BitrixRelation {
     DEAL_PAYMENT = "UF_CRM_1706525888764",
     DEAL_CURRENCY = "UF_CRM_1706711967417",
     DEAL_COST = "UF_CRM_1706711952029",
+    DEAL_POST_ID = "UF_CRM_1706873714861"
 }
 
 export type BitrixMultiplyField = {

@@ -25,11 +25,14 @@ export interface RecordEntry {
 
 export interface ManychatUserData {
     id: string;
+    phone: string,
     custom_fields: CustomFields;
 }
 
 export interface ManychatDealData {
+    id: number,
     bitrix_id: number,
+    profile_name: string,
     post_id: string,
     delivery: boolean,
     payment: boolean,
@@ -42,7 +45,8 @@ interface CustomFields {
     bitrix_id: string | null;
     bitrix_user_category: string;
     bitrix_user_region: string;
-    profile_phone: string;
+    bitrix_active_deals: Array<number | string>,
+    bitrix_closed_deals: Array<number | string>,
     profile_category: string;
     profile_email: string | null;
     profile_name: string;
