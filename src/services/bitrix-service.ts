@@ -61,13 +61,13 @@ export class Bitrix24 {
         try {
             const {bitrix_id, post_id, id: telegramId} = dealData
             const dealsList = await this.getUserDeals(post_id, bitrix_id)
-            const builder = new MessageBuilder();
+            const messageBuilder = new MessageBuilder();
             const manyChat = new ManyChatService()
             const {custom_fields} = await manyChat.getUserDataById(dealData.bitrix_id)
             const {bitrix_active_deals, bitrix_closed_deals} = custom_fields
 
             if(dealsList.total > 0 && (bitrix_active_deals.includes(post_id) || bitrix_closed_deals.includes(post_id))) {
-                const messageJson = builder
+                const messageJson = messageBuilder
                     .addTextMessage("Вы уже взяли данную заявку, пожалуйста, ожидайте следующей рассылки")
 
                 return {
@@ -77,20 +77,27 @@ export class Bitrix24 {
             }
 
             const mappingBitrixDeal = bitrixDealConvert(dealData)
-            const messageJson = builder
-                .addTextMessage("Спасибо! После выполнения задания воспользуйтесь командой /report , что рассказать о своих результатах")
             const dealResponse = await axios.post(`${this.webhookUrlProd}crm.deal.add`, {fields: mappingBitrixDeal});
-
-            const setField = manyChat.setUserField({
-                subscriber_id: telegramId,
-                field_name: "bitrix_active_deals",
-                field_value: dealResponse.data.result
-            })
-
-            return {
-                result: dealResponse.data.result,
-                message: {...messageJson.message}
-            };
+            if(dealResponse.data.result) {
+                const setField = await manyChat.setUserField({
+                    subscriber_id: telegramId,
+                    field_name: "bitrix_active_deals",
+                    field_value: [...bitrix_active_deals, dealResponse.data.result]
+                })
+                const messageJson = messageBuilder
+                    .addTextMessage("Спасибо! После выполнения задания воспользуйтесь командой /report , что рассказать о своих результатах")
+                return {
+                    result: dealResponse.data.result,
+                    message: {...messageJson.message}
+                };
+            } else {
+                const messageJson = messageBuilder
+                    .addTextMessage("При создании заявки возникла проблема. Обратитесь в техническую поддержку: /support")
+                return {
+                    result: dealResponse.data.result,
+                    message: {...messageJson.message}
+                };
+            }
         } catch (error) {
             throw error;
         }

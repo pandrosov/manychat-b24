@@ -16,6 +16,8 @@ dealRouter.post('/add', async (req: RequestWithBody<ManychatDealData>, res: Resp
         if(dealResponse.result) {
             res.status(HTTP_CODES_RESPONSE.CREATED).send({message})
         }
+
+        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST)
     } catch (error) {
         res.status(HTTP_CODES_RESPONSE.BAD_REQUEST)
     }
