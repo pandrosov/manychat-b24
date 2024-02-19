@@ -12,12 +12,12 @@ app.listen(port, async () => {
     console.log(`start server on port ${port}`)
 })
 
-bot.on('message', (msg) => {
-    const chatId = msg.chat.id;
-    console.log(msg);
-
-    // Пример отправки ответа
-    if (msg.text?.toLowerCase() === 'hello') {
-        bot.sendMessage(chatId, 'Привет! Как я могу помочь тебе сегодня?');
-    }
-});
+// bot.on('message', (msg) => {
+//     const chatId = msg.chat.id;
+//     console.log(msg);
+//
+//     // Пример отправки ответа
+//     if (msg.text?.toLowerCase() === 'hello') {
+//         bot.sendMessage(chatId, 'Привет! Как я могу помочь тебе сегодня?');
+//     }
+// });
