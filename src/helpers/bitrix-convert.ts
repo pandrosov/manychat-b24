@@ -1,34 +1,45 @@
 import {LeadRequest, ManychatDealData, ManychatUserData} from "../types/bitrix/input/input";
 import {BitrixMultiplyField, BitrixRelation} from "../types/bitrix/common";
-import {Mapping} from "../types/common";
-import {Bitrix24} from "../services/bitrix-service";
+import {BitrixUserResponse} from "../types/bitrix/output/bitrix-response";
+import {ConvertedBitrixContact} from "../types/bitrix/output/output";
+import {BITRIX_CONST, bitrixIMArr, bitrixPhoneEmailArr, bitrixValues, SOCIAL_TYPE} from "./constants";
 
-const SOCIAL_TYPE = {
-    INSTAGRAM: "INSTAGRAM",
-    TELEGRAM: "TELEGRAM",
-};
+const fillMultyFieldsBitrix = (socials: string, phone: string) => {
+    const socialsOutput: BitrixMultiplyField[] = [];
+    const phoneOutput: BitrixMultiplyField[] = [];
 
-const bitrixValues: Mapping = {
-    common: "3705",
-    animal: "3707",
-    ru: "3709",
-    by: "3713",
-    kz: "3711"
-}
+    const socialUrls = socials?.split(",") || [];
+    socialUrls.forEach(url => {
+        const socialType = url.includes("instagram.com") ? SOCIAL_TYPE.INSTAGRAM :
+            url.includes("t.me") ? SOCIAL_TYPE.TELEGRAM :
+                url.includes("tiktok.com") ? "OTHER" : "OTHER";
+        if (url.includes("instagram.com")) {
+            url = extractInstUsername(url)
+        }
+        socialsOutput.push({
+            ...bitrixIMArr,
+            VALUE_TYPE: socialType,
+            VALUE: url
+        });
+    });
 
-const BITRIX_CONST = {
-    CONTACT_TYPE: "UC_2HCWL8",
-    CONTACT_ASSIGNED: 26355,
-    DEAL_ASSIGNED: 26355,
-    DEAL_TYPE: 1,
-    DEAL_CATEGORY: 35
+    phoneOutput.push({
+        ...bitrixPhoneEmailArr,
+        VALUE: phone,
+        TYPE_ID: "PHONE"
+    })
+
+    return {
+        socialUrls: socialsOutput,
+        phones: phoneOutput
+    }
 }
 
 const extractInstUsername = (url: string): string => {
     return (url.match(/instagram\.com\/([^/?]+)/) || [])[1] || "Невалидная ссылка";
 }
 
-export const bitrixContactConvert = (inputData: ManychatUserData): any => {
+export const bitrixContactConvert = (inputData: ManychatUserData): ConvertedBitrixContact => {
     const telegramId = inputData.id
     const profile_phone = inputData.phone
     const {
@@ -36,60 +47,19 @@ export const bitrixContactConvert = (inputData: ManychatUserData): any => {
         profile_socials,
         profile_address,
         profile_card,
-        bitrix_user_category ,
+        bitrix_user_category,
         bitrix_user_region
     } = inputData.custom_fields
     const addressParts = profile_address?.split("/") || [];
     const [fact_address, pvz_address] = addressParts;
-    const bitrixIMArr:BitrixMultiplyField = {
-        VALUE_TYPE: "OTHER",
-        VALUE: "",
-        TYPE_ID: "IM"
-    };
-    const bitrixPhoneEmailArr:BitrixMultiplyField = {
-        VALUE_TYPE: "WORK",
-        VALUE: "",
-        TYPE_ID: "IM"
-    };
-    const socials:BitrixMultiplyField[] = [];
-    // const email:BitrixMultiplyField[] = [];
-    const phone:BitrixMultiplyField[] = [];
-
-    const socialUrls = profile_socials?.split(",") || [];
-    socialUrls.forEach(url => {
-        const socialType = url.includes("instagram.com") ? SOCIAL_TYPE.INSTAGRAM :
-                                  url.includes("t.me") ? SOCIAL_TYPE.TELEGRAM :
-                                  url.includes("tiktok.com") ? "OTHER" : "OTHER";
-        if(url.includes("instagram.com")) {
-            url = extractInstUsername(url)
-        }
-        socials.push({
-            ...bitrixIMArr,
-            VALUE_TYPE: socialType,
-            VALUE: url
-        });
-    });
-
-    // email.push({
-    //     ...bitrixPhoneEmailArr,
-    //     VALUE: profile_email ? profile_email : "",
-    //     TYPE_ID: "EMAIL"
-    // })
-
-    phone.push({
-        ...bitrixPhoneEmailArr,
-        VALUE: profile_phone,
-        TYPE_ID: "PHONE"
-    })
-
+    const {socialUrls: socials, phones: phone} = fillMultyFieldsBitrix(profile_socials, profile_phone)
 
     return {
         [BitrixRelation.CONTACT_TYPE_ID]: BITRIX_CONST.CONTACT_TYPE,
         [BitrixRelation.CONTACT_NAME]: profile_name,
-        [BitrixRelation.CONTACT_EMAIL]: fact_address,
         [BitrixRelation.CONTACT_PHONE]: phone,
-        [BitrixRelation.CONTACT_ADDRESS]: fact_address,
-        [BitrixRelation.CONTACT_OTH_ADDRESS]: pvz_address,
+        [BitrixRelation.CONTACT_ADDRESS]: fact_address ? fact_address : profile_address,
+        [BitrixRelation.CONTACT_OTH_ADDRESS]: pvz_address ? pvz_address : "",
         [BitrixRelation.CONTACT_CATEGORY]: bitrixValues[bitrix_user_category],
         [BitrixRelation.CONTACT_REGION]: bitrixValues[bitrix_user_region],
         [BitrixRelation.CONTACT_SOCIALS]: socials,
@@ -100,7 +70,22 @@ export const bitrixContactConvert = (inputData: ManychatUserData): any => {
 };
 
 
-export const bitrixLeadConvert = (leadData: LeadRequest):any => {
+export const bitrixUpdateContact = (bitrixProfile: BitrixUserResponse, updateData: ConvertedBitrixContact) => {
+    // получаем данные из B24
+    const {
+        IM: messangers,
+        PHONE: phones,
+    } = bitrixProfile.result
+    messangers.forEach(item => item.VALUE = "")
+    phones.forEach(item => item.VALUE = "")
+    updateData[BitrixRelation.CONTACT_SOCIALS] = updateData[BitrixRelation.CONTACT_SOCIALS].concat(messangers)
+    updateData[BitrixRelation.CONTACT_PHONE] = updateData[BitrixRelation.CONTACT_PHONE].concat(phones)
+
+    // формируем новый массив данных
+    return updateData;
+}
+
+export const bitrixLeadConvert = (leadData: LeadRequest): any => {
     const {records, phone, fullname, email} = leadData.data
     const comments = records.find(i => i.idx === '5')?.value || ''
     const region = records.find(i => i.idx === '6')?.value || ''
@@ -122,12 +107,12 @@ export const bitrixLeadConvert = (leadData: LeadRequest):any => {
             }
         ],
         [BitrixRelation.LEAD_TITLE]: 'TapLink Lead',
-        [BitrixRelation.LEAD_COMMENTS]: comments  + '</br> Регион ' + region,
+        [BitrixRelation.LEAD_COMMENTS]: comments + '</br> Регион ' + region,
         [BitrixRelation.LEAD_ASSIGNED_BY_ID]: 26733
     }
 }
 
-export const bitrixDealConvert = (dealData:ManychatDealData) : any => {
+export const bitrixDealConvert = (dealData: ManychatDealData): any => {
     const {
         bitrix_id,
         profile_name,

@@ -1,13 +1,21 @@
 import axios, {AxiosResponse} from 'axios';
 import {BitrixRelation} from "../types/bitrix/common";
-import {BitrixResponse, DealsList} from "../types/bitrix/output/bitrix-response";
+import {
+    BitrixResponse,
+    BitrixUserResponse,
+    DealCreatedResponse, DealResponse,
+    DealsList
+} from "../types/bitrix/output/bitrix-response";
 import {LeadRequest, ManychatDealData, ManychatUserData} from "../types/bitrix/input/input";
-import e from "express";
-import {bitrixContactConvert, bitrixDealConvert, bitrixLeadConvert} from "../helpers/bitrix-convert";
-import ManychatService from "./manychat-service";
+import {
+    bitrixContactConvert,
+    bitrixDealConvert,
+    bitrixLeadConvert,
+    bitrixUpdateContact
+} from "../helpers/bitrix-convert";
 import ManyChatService from "./manychat-service";
 import {MessageBuilder} from "../helpers/manychat-messages";
-import {DealResponse} from "../types/bitrix/output/output";
+import {ConvertedBitrixContact} from "../types/bitrix/output/output";
 
 export class Bitrix24 {
     private readonly webhookUrl: string;
@@ -21,25 +29,46 @@ export class Bitrix24 {
         }
     }
 
+    async getUserById(bitrixId: string): Promise<BitrixUserResponse> {
+        try {
+            const response = await axios.post(`${this.webhookUrlProd}crm.contact.get`, {id: bitrixId});
+            return response.data
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async createContact(contactData: ManychatUserData): Promise<number> {
         try {
+            const {custom_fields} = contactData
+            const { bitrix_user_id} = custom_fields
             const userData = bitrixContactConvert(contactData)
-            const response: AxiosResponse<BitrixResponse, any> = await axios.post(`${this.webhookUrlProd}crm.contact.add`, {fields: userData});
 
-            return response.data.result
+            if (!bitrix_user_id) {
+                const response: AxiosResponse<BitrixResponse, any> = await axios.post(`${this.webhookUrlProd}crm.contact.add`, {fields: userData});
+                return response.data.result
+            } else {
+                return await this.updateContact(bitrix_user_id, userData)
+            }
         } catch (error) {
             console.error('Error creating contact:', error);
             throw error;
         }
     }
 
-    async updateContact(contactId: number, updateData: ManychatUserData): Promise<void> {
+    async updateContact(bitrixId: string, updateData: ConvertedBitrixContact): Promise<number> {
         try {
-            const response = await axios.post(`${this.webhookUrl}crm.contact.update`, {
-                id: contactId,
-                fields: updateData
+            // !TODO
+            // [+] - получаем по номеру телефона, мессенджерам и имейлам данные из карточки битры
+            // [+] - обнуляем эти данные
+            // [+] - записываем новые данные
+            const bitrixProfile = await this.getUserById(bitrixId)
+            const bitrixUpdateData = bitrixUpdateContact(bitrixProfile, updateData)
+            const response = await axios.post(`${this.webhookUrlProd}crm.contact.update`, {
+                id: bitrixId,
+                fields: bitrixUpdateData
             });
-            console.log('Contact updated:', response);
+            return response.data.result ? 1 : 0;
         } catch (error) {
             console.error('Error updating contact:', error);
             throw error;
@@ -57,16 +86,35 @@ export class Bitrix24 {
         }
     }
 
-    async createDeal(dealData: ManychatDealData): Promise<DealResponse> {
+    async getDeal(dealId: number | string): Promise<DealResponse> {
+        try {
+            const deal = await axios.post(`${this.webhookUrlProd}crm.deal.get`, {
+                id: dealId
+            })
+
+            return deal.data
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async createDeal(dealData: ManychatDealData): Promise<DealCreatedResponse> {
         try {
             const {bitrix_id, post_id, id: telegramId} = dealData
-            const dealsList = await this.getUserDeals(post_id, bitrix_id)
+            const filter = {
+                filter: {
+                    ["=" + BitrixRelation.DEAL_POST_ID]: post_id,
+                    ["=" + BitrixRelation.DEAL_CONTACT_ID]: bitrix_id
+                }
+            }
+            const dealsList = await this.getUserDeals(filter)
             const messageBuilder = new MessageBuilder();
             const manyChat = new ManyChatService()
-            const {custom_fields} = await manyChat.getUserDataById(dealData.bitrix_id)
-            const {bitrix_active_deals, bitrix_closed_deals} = custom_fields
+            const {custom_fields} = await manyChat.getUserDataById(telegramId)
+            const bitrixActiveDeals = custom_fields.find(item => item.id === 10490344)?.value as Array<number | string> || [];
+            const bitrixClosedDeals = custom_fields.find(item => item.id === 10490344)?.value as Array<number | string> || [];
 
-            if(dealsList.total > 0 && (bitrix_active_deals.includes(post_id) || bitrix_closed_deals.includes(post_id))) {
+            if (dealsList.total > 0) {
                 const messageJson = messageBuilder
                     .addTextMessage("Вы уже взяли данную заявку, пожалуйста, ожидайте следующей рассылки")
 
@@ -78,11 +126,12 @@ export class Bitrix24 {
 
             const mappingBitrixDeal = bitrixDealConvert(dealData)
             const dealResponse = await axios.post(`${this.webhookUrlProd}crm.deal.add`, {fields: mappingBitrixDeal});
-            if(dealResponse.data.result) {
+
+            if (dealResponse.data.result) {
                 const setField = await manyChat.setUserField({
                     subscriber_id: telegramId,
                     field_name: "bitrix_active_deals",
-                    field_value: [...bitrix_active_deals, dealResponse.data.result]
+                    field_value: [...bitrixActiveDeals, dealResponse.data.result]
                 })
                 const messageJson = messageBuilder
                     .addTextMessage("Спасибо! После выполнения задания воспользуйтесь командой /report , что рассказать о своих результатах")
@@ -103,15 +152,14 @@ export class Bitrix24 {
         }
     }
 
-    async getUserDeals(postId: string, userId: number): Promise<DealsList> {
-        const dealsResponse = await axios.post(`${this.webhookUrlProd}crm.deal.add`, {
-            filter: {
-                ["=" + BitrixRelation.DEAL_POST_ID]: postId,
-                ["=" + BitrixRelation.DEAL_CONTACT_ID]: userId
-            }
-        });
+    async getUserDeals(filter: any): Promise<DealsList> {
+        try {
+            const dealsResponse = await axios.post(`${this.webhookUrlProd}crm.deal.list`, filter);
 
-        return dealsResponse.data
+            return dealsResponse.data
+        } catch (error) {
+            throw error
+        }
     }
 
     async updateDeal(contactId: number, updateData: ManychatUserData): Promise<void> {

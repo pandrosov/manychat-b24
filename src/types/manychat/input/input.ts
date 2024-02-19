@@ -9,6 +9,14 @@ export interface IAction {
     value: string | number | Array<number>
 }
 
+export interface ISetCustomFieldsData {
+    subscriber_id: number;
+    fields: Array<{
+        field_name: string,
+        field_id?: number,
+        field_value: string | Date | number | Array<number | string>
+    }>
+}
 export interface IQuickReply {
     // Определите структуру быстрого ответа здесь
 }

@@ -1,6 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 import {ManychatUserData} from "../types/bitrix/input/input";
 import {IManyChatField} from "../types/manychat/common";
+import {ManyChatUserDataResponse} from "../types/manychat/output/manychat-respone";
+import {ISetCustomFieldsData} from "../types/manychat/input/input";
 
 class ManyChatService {
     private axiosInstance: AxiosInstance;
@@ -15,10 +17,10 @@ class ManyChatService {
         });
     }
 
-    async getUserDataById(userId: number): Promise<ManychatUserData> {
+    async getUserDataById(userId: number | string): Promise<ManyChatUserDataResponse> {
         try {
             const response = await this.axiosInstance.get(`subscriber/getInfo?subscriber_id=${userId}`);
-            return response.data;
+            return response.data.data;
         } catch (error) {
             console.error('Error fetching user data:', error);
             throw error;
@@ -30,6 +32,15 @@ class ManyChatService {
             return response.data;
         } catch (error) {
             console.error('Error updating user data:', error);
+            throw error;
+        }
+    }
+    async setCustomFieldsForUser(data:ISetCustomFieldsData): Promise<any> {
+        try {
+            const response = await this.axiosInstance.post(`subscriber/setCustomFields`, data);
+            return response.data;
+        } catch (error) {
+            console.error('Error setting custom fields:', error);
             throw error;
         }
     }

@@ -30,17 +30,8 @@ export enum BitrixRelation {
 }
 
 export type BitrixMultiplyField = {
+    ID: string,
     VALUE_TYPE: string,
     VALUE: string,
     TYPE_ID: string
-}
-
-export enum BitrixClientConstData {
-}
-
-export enum BitrixDealConstData {
-
-}
-
-export class BitrixContact {
 }

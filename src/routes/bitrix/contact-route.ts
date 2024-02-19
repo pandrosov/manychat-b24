@@ -7,18 +7,18 @@ import {MessageBuilder} from "../../helpers/manychat-messages";
 
 export const contactRoute = Router({})
 
-// contactRoute.get('/', (req: Request, res: Response) => {
-//     // res.sendStatus(200)
-//     res.status(200).send({"hello": "world"})
-// })
-
 contactRoute.post('/add', async (req: RequestWithBody<ManychatUserData>, res: Response) => {
     try {
         const bitrixService = new Bitrix24()
         const response = await bitrixService.createContact(req.body)
+        const builder = new MessageBuilder();
 
-        if(response !== 0) {
-            const builder = new MessageBuilder();
+        if(response === 1) {
+            const messageJson = builder
+                .addTextMessage("Отлично, Ваши данные были изменены")
+            res.status(HTTP_CODES_RESPONSE.SUCCESS).send({...messageJson.message})
+            return
+        } else if (response > 1) {
             const messageJson = builder
                 .addTextMessage("Отлично! Мы заполнили профиль Самого лучшего амбассадора. Если какие-то твои контактные данные изменятся, ты всегда можешь обновить информацию нажав на кнопку “Мой профиль”. \n" +
                     "\n" +
@@ -29,10 +29,10 @@ contactRoute.post('/add', async (req: RequestWithBody<ManychatUserData>, res: Re
                     value: response
                 })
             res.status(HTTP_CODES_RESPONSE.CREATED).send({...messageJson.message})
+            return
         } else {
-            res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({contact_id: response})
+            res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({error: 'contact created error'})
         }
-
     } catch(error) {
         res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({error: error})
     }

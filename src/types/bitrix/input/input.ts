@@ -42,11 +42,11 @@ export interface ManychatDealData {
 }
 
 interface CustomFields {
-    bitrix_id: string | null;
+    bitrix_user_id: string | null;
     bitrix_user_category: string;
     bitrix_user_region: string;
-    bitrix_active_deals: Array<number | string>,
-    bitrix_closed_deals: Array<number | string>,
+    bitrix_active_deals: Array<number | string> | null,
+    bitrix_closed_deals: Array<number | string> | null,
     profile_category: string;
     profile_email: string | null;
     profile_name: string;
