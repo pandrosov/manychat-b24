@@ -23,6 +23,14 @@ export interface RecordEntry {
     title: string;
 }
 
+export type DealListParams = {
+    id: number
+}
+
+export type DealListReq = {
+    bitrix_id: number
+}
+
 export interface ManychatUserData {
     id: string;
     phone: string,
