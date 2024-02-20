@@ -24,13 +24,13 @@ webhookRouter.post('/', async(req: RequestWithBody<WebhookBody>, res: Response) 
                     const {custom_fields} = manyChatUser
                     const bitrixActiveDeals = custom_fields.find(item => item.name === "bitrix_active_deals")?.value as Array<number | string> || [];
                     const bitrixClosedDeals = custom_fields.find(item => item.name === "bitrix_closed_deals")?.value as Array<number | string> || [];
-                    let filtredActiveDeals: (string|number)[] = []
-                    let filtredClosedDeals: (string|number)[] = []
+                    let filteredActiveDeals: (string|number)[] = []
+                    let filteredClosedDeals: (string|number)[] = []
 
 
                     if(bitrixActiveDeals.includes(reqData.FIELDS.ID) || bitrixClosedDeals.includes(reqData.FIELDS.ID)) {
-                        filtredActiveDeals = bitrixActiveDeals.filter(deal => deal === reqData.FIELDS.ID)
-                        filtredClosedDeals = bitrixClosedDeals.filter(deal => deal === reqData.FIELDS.ID)
+                        filteredActiveDeals = bitrixActiveDeals.filter(deal => deal === reqData.FIELDS.ID)
+                        filteredClosedDeals = bitrixClosedDeals.filter(deal => deal === reqData.FIELDS.ID)
                     }
 
                     const updManyChatUser = await manyChat.setCustomFieldsForUser({
@@ -38,11 +38,11 @@ webhookRouter.post('/', async(req: RequestWithBody<WebhookBody>, res: Response) 
                         fields: [
                             {
                                 field_name: 'bitrix_active_deals',
-                                field_value: filtredActiveDeals
+                                field_value: filteredActiveDeals
                             },
                             {
                                 field_name: 'bitrix_closed_deals',
-                                field_value: filtredClosedDeals
+                                field_value: filteredClosedDeals
                             }
                         ]
                     })
