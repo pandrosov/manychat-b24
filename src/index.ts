@@ -15,19 +15,19 @@ app.listen(port, async () => {
     console.log(`start server on port ${port}`)
 })
 
-bot.on('message', async (msg) => {
-    try {
+// bot.on('message', async (msg) => {
+//     try {
         // !TODO
         // [+] - получить данные юзера
         // [+] - проверить есть ли открытый отчет для заполнения
         // [+] - если нет - пишем в карточку КА, если есть - пишем в сделку активную
-        const {first_name, last_name} = msg.chat;
-        const manyChatService = new ManyChatService()
-        const bitrixService = new Bitrix24()
-        if ('contact' in msg) {
-            // Пользователь поделился контактом
-            console.log("Пользователь поделился номером телефона:", msg?.contact?.phone_number);
-        }
+        // const {first_name, last_name} = msg.chat;
+        // const manyChatService = new ManyChatService()
+        // const bitrixService = new Bitrix24()
+        // if (!msg?.from?.is_bot && 'contact' in msg) {
+        //     // Пользователь поделился контактом
+        //     console.log("Пользователь поделился номером телефона:", msg?.contact?.phone_number);
+        // }
         // let userName = ""
         // if(first_name) {
         //     userName = first_name
@@ -51,8 +51,8 @@ bot.on('message', async (msg) => {
         //
         // const newCommentLine = await bitrixService.addEntityComment(activeReportId ? "deal" : "contact", activeReportId ? activeReportId : bitrixId, comment)
         // console.log("New timeline comment ", newCommentLine)
-    } catch (error) {
-        console.error(error)
-    }
-
-});
+//     } catch (error) {
+//         console.error(error)
+//     }
+//
+// });
