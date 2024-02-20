@@ -120,7 +120,7 @@ export class Bitrix24 {
 
                 return {
                     result: post_id,
-                    message: {...messageJson.message}
+                    message: messageJson.message
                 }
             }
 

@@ -34,15 +34,10 @@ contactRoute.post('/add', async (req: RequestWithBody<ManychatUserData>, res: Re
             res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({error: 'contact created error'})
         }
     } catch(error) {
-        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({error: error})
+        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({
+            status: "error",
+            message: "Catch undefined error"
+        })
     }
-})
-
-contactRoute.post('/update', (req: Request, res: Response) => {
-    res.sendStatus(200)
-})
-
-contactRoute.put('/delete', (req: Request, res: Response) => {
-    res.sendStatus(200)
 })
 

@@ -1,7 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {HTTP_CODES_RESPONSE} from "../../types/common";
-
-// token: cGFuZHJvc292OjhRXV5BKV0wNSxBY3Jla30=
+s
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const auth = req.headers['authorization']
     if(!auth) {

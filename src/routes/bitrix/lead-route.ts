@@ -14,6 +14,9 @@ leadRoute.post('/add', async (req: RequestWithBody<LeadRequest>, res: Response)=
             res.status(HTTP_CODES_RESPONSE.CREATED).send({result: leadResponse})
         }
     } catch (error) {
-        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({error})
+        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({
+            status: "error",
+            message: "Error catching lead"
+        })
     }
 })

@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import {ManychatUserData} from "../types/bitrix/input/input";
 import {IManyChatField} from "../types/manychat/common";
-import {ManyChatUserDataResponse} from "../types/manychat/output/manychat-respone";
+import {ManyChatUserDataResponse, ManyChatUserNameDataResponse} from "../types/manychat/output/manychat-respone";
 import {ISetCustomFieldsData} from "../types/manychat/input/input";
 
 class ManyChatService {
@@ -26,6 +26,17 @@ class ManyChatService {
             throw error;
         }
     }
+
+    async getUserDataByName(userName: string): Promise<ManyChatUserNameDataResponse> {
+        try {
+            const {data:response} = await this.axiosInstance.get(`subscriber/findByName?name=${encodeURIComponent(userName)}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+            throw error;
+        }
+    }
+
     async setUserField(fieldData: IManyChatField): Promise<string> {
         try {
             const response = await this.axiosInstance.post(`subscriber/setCustomFieldByName`, fieldData);

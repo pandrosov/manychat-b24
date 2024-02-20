@@ -15,6 +15,51 @@ webhookRouter.post('/', async(req: RequestWithBody<WebhookBody>, res: Response) 
         const {event, data: reqData, auth} = req.body
 
         switch (event) {
+            case "ONCRMDEALDELETE": {
+                const deal = await bitrix.getDeal(reqData.FIELDS.ID)
+                const {CATEGORY_ID: tunnelId, CONTACT_ID: bitrixId, STAGE_ID: status} = deal.result
+                if(tunnelId === 35) {
+                    const bitrixUser = await bitrix.getUserById(bitrixId)
+                    const manyChatUser = await manyChat.getUserDataById(bitrixUser.result[BitrixRelation.CONTACT_TELEGRAM_ID])
+                    const {custom_fields} = manyChatUser
+                    const bitrixActiveDeals = custom_fields.find(item => item.name === "bitrix_active_deals")?.value as Array<number | string> || [];
+                    const bitrixClosedDeals = custom_fields.find(item => item.name === "bitrix_closed_deals")?.value as Array<number | string> || [];
+                    let filtredActiveDeals: (string|number)[] = []
+                    let filtredClosedDeals: (string|number)[] = []
+
+
+                    if(bitrixActiveDeals.includes(reqData.FIELDS.ID) || bitrixClosedDeals.includes(reqData.FIELDS.ID)) {
+                        filtredActiveDeals = bitrixActiveDeals.filter(deal => deal === reqData.FIELDS.ID)
+                        filtredClosedDeals = bitrixClosedDeals.filter(deal => deal === reqData.FIELDS.ID)
+                    }
+
+                    const updManyChatUser = await manyChat.setCustomFieldsForUser({
+                        subscriber_id: manyChatUser.id,
+                        fields: [
+                            {
+                                field_name: 'bitrix_active_deals',
+                                field_value: filtredActiveDeals
+                            },
+                            {
+                                field_name: 'bitrix_closed_deals',
+                                field_value: filtredClosedDeals
+                            }
+                        ]
+                    })
+
+                    if(updManyChatUser.status === "success") {
+                        res.sendStatus(HTTP_CODES_RESPONSE.SUCCESS)
+                        break;
+                    } else {
+                        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({
+                            status: "error",
+                            message: "bad request during updating manychat user"
+                        })
+                    }
+
+                }
+                break;
+            }
             case "ONCRMDEALUPDATE": {
                 // !TODO
                 // [+] - получаем сделку
@@ -27,8 +72,8 @@ webhookRouter.post('/', async(req: RequestWithBody<WebhookBody>, res: Response) 
                     const bitrixUser = await bitrix.getUserById(bitrixId)
                     const manyChatUser = await manyChat.getUserDataById(bitrixUser.result[BitrixRelation.CONTACT_TELEGRAM_ID])
                     const {custom_fields} = manyChatUser
-                    const bitrixActiveDeals = custom_fields.find(item => item.id === 10490344)?.value as Array<number | string> || [];
-                    const bitrixClosedDeals = custom_fields.find(item => item.id === 10490344)?.value as Array<number | string> || [];
+                    const bitrixActiveDeals = custom_fields.find(item => item.name === "bitrix_active_deals")?.value as Array<number | string> || [];
+                    const bitrixClosedDeals = custom_fields.find(item => item.name === "bitrix_closed_deals")?.value as Array<number | string> || [];
 
                     // если сделка не имеет положительного статуса
                     if(status !== BITRIX_DEAL_STATUS.checked || status !== BITRIX_DEAL_STATUS.success || status !== BITRIX_DEAL_STATUS.failed) {
@@ -76,7 +121,10 @@ webhookRouter.post('/', async(req: RequestWithBody<WebhookBody>, res: Response) 
                         res.sendStatus(HTTP_CODES_RESPONSE.SUCCESS)
                         break;
                     } else {
-                        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send(updManyChatUser.message)
+                        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({
+                            status: "error",
+                            message: "bad request during updating manychat user"
+                        })
                     }
 
                 }
@@ -122,12 +170,18 @@ webhookRouter.post('/', async(req: RequestWithBody<WebhookBody>, res: Response) 
                         res.sendStatus(HTTP_CODES_RESPONSE.SUCCESS)
                         break;
                     } else {
-                        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send(updManyChatUser.message)
+                        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({
+                            status: "error",
+                            message: "bad request during updating manychat user"
+                        })
                     }
                 }
                 break;
         }
     } catch (error) {
-        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send(error)
+        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({
+            status: "error",
+            message: "bitrix hook troubles"
+        })
     }
 })

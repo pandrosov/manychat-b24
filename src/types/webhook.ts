@@ -4,7 +4,7 @@ export interface WebhookBody {
     auth: WebhookAuth
 }
 
-type WebhookEvents =  "ONCRMDEALUPDATE" | "ONCRMCONTACTUPDATE"
+type WebhookEvents =  "ONCRMDEALUPDATE" | "ONCRMCONTACTUPDATE" | "ONCRMDEALDELETE"
 
 interface WebhookData {
     FIELDS: {

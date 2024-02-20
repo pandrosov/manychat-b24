@@ -3,7 +3,6 @@ import {HTTP_CODES_RESPONSE, RequestWithBody, RequestWithBodyAndParams, RequestW
 import {DealListParams, DealListReq, ManychatDealData} from "../../types/bitrix/input/input";
 import {Bitrix24} from "../../services/bitrix-service";
 import {BitrixRelation} from "../../types/bitrix/common";
-import {BITRIX_DEAL_STATUS} from "../../helpers/constants";
 
 export const dealRouter = Router({})
 dealRouter.get('/all', async (req: RequestWithBodyAndParams<DealListParams, DealListReq>, res: Response) => {
@@ -20,7 +19,10 @@ dealRouter.get('/all', async (req: RequestWithBodyAndParams<DealListParams, Deal
 
         res.status(200).send({result: dealList.result})
     } catch (error) {
-        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send(error)
+        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({
+            status: "error",
+            message: "Get user deal error request"
+        })
     }
 })
 dealRouter.post('/add', async (req: RequestWithBody<ManychatDealData>, res: Response) => {
