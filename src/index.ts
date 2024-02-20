@@ -41,6 +41,7 @@ bot.on('message', async (msg) => {
         }
 
         const newCommentLine = await bitrixService.addEntityComment(activeReportId ? "deal" : "contact", activeReportId ? activeReportId : bitrixId, comment)
+        console.log("New timeline comment ", newCommentLine)
     } catch (error) {
         console.error(error)
     }
