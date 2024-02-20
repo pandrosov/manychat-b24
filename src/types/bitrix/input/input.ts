@@ -9,6 +9,8 @@ export interface LeadRequest {
     data: LeadData;
 }
 
+export const BitrixEntityType = Array("deal", "lead", "contact")
+
 interface LeadData {
     records: RecordEntry[];
     email: string;
