@@ -9,6 +9,8 @@ export interface LeadRequest {
     data: LeadData;
 }
 
+export const BitrixEntityType = Array("deal", "lead", "contact")
+
 interface LeadData {
     records: RecordEntry[];
     email: string;
@@ -21,6 +23,14 @@ export interface RecordEntry {
     value: string;
     idx: string;
     title: string;
+}
+
+export type DealListParams = {
+    id: number
+}
+
+export type DealListReq = {
+    bitrix_id: number
 }
 
 export interface ManychatUserData {

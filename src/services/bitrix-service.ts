@@ -162,6 +162,22 @@ export class Bitrix24 {
         }
     }
 
+    async addEntityComment(type: string, id: number | string, comment: string): Promise<BitrixResponse> {
+        try {
+            const commentCreated = await axios.post(`${this.webhookUrlProd}crm.timeline.comment.add`, {
+                fields: {
+                    ENTITY_ID: id,
+                    ENTITY_TYPE: type,
+                    COMMENT: comment
+                }
+            })
+
+            return commentCreated.data.result
+        } catch (error) {
+            throw error
+        }
+    }
+
     async updateDeal(contactId: number, updateData: ManychatUserData): Promise<void> {
         try {
             const response = await axios.post(`${this.webhookUrl}crm.deal.update`, {id: contactId, fields: updateData});
