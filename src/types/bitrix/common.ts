@@ -17,6 +17,7 @@ export enum BitrixRelation {
     LEAD_TITLE = "TITLE",
     LEAD_COMMENTS = "COMMENTS",
     LEAD_ASSIGNED_BY_ID = "ASSIGNED_BY_ID",
+    DEAL_ID = "ID",
     DEAL_TITLE = "TITLE",
     DEAL_CATEGORY_ID = "CATEGORY_ID",
     DEAL_CONTACT_ID = "CONTACT_ID",

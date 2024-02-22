@@ -16,7 +16,8 @@ contactRoute.post('/add', async (req: RequestWithBody<ManychatUserData>, res: Re
         if(response === 1) {
             const messageJson = builder
                 .addTextMessage("Отлично, Ваши данные были изменены")
-            res.status(HTTP_CODES_RESPONSE.SUCCESS).send({...messageJson.message})
+                .build()
+            res.status(HTTP_CODES_RESPONSE.SUCCESS).send(messageJson)
             return
         } else if (response > 1) {
             const messageJson = builder
@@ -28,7 +29,8 @@ contactRoute.post('/add', async (req: RequestWithBody<ManychatUserData>, res: Re
                     field_name: "bitrix_user_id",
                     value: response
                 })
-            res.status(HTTP_CODES_RESPONSE.CREATED).send({...messageJson.message})
+                .build()
+            res.status(HTTP_CODES_RESPONSE.CREATED).send(messageJson)
             return
         } else {
             res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({error: 'contact created error'})

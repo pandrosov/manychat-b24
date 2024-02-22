@@ -1,6 +1,14 @@
 export interface IMessage {
     type: string;
     text?: string;
+    buttons?: IButton[];
+}
+
+export interface IButton {
+    type: string;
+    caption: string;
+    target: string;
+    actions?: IAction[]; // Предполагаем, что IAction уже определен
 }
 
 export interface IAction {

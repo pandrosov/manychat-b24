@@ -9,7 +9,7 @@ class ManyChatService {
 
     constructor() {
         this.axiosInstance = axios.create({
-            baseURL: 'https://api.manychat.com/fb/', // Пример базового URL
+            baseURL: 'https://api.manychat.com/fb/',
             headers: {
                 'Authorization': `Bearer ${process.env.MANYCHAT_TOKEN}`,
                 'Content-Type': 'application/json'
@@ -37,6 +37,16 @@ class ManyChatService {
         }
     }
 
+    async getUserBySystemField(phone:string): Promise<ManyChatUserDataResponse> {
+        try {
+            const response = await this.axiosInstance.post(`subscriber/setCustomFields?phone=${encodeURIComponent(phone)}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error setting custom fields:', error);
+            throw error;
+        }
+    }
+
     async setUserField(fieldData: IManyChatField): Promise<string> {
         try {
             const response = await this.axiosInstance.post(`subscriber/setCustomFieldByName`, fieldData);
@@ -46,6 +56,7 @@ class ManyChatService {
             throw error;
         }
     }
+
     async setCustomFieldsForUser(data:ISetCustomFieldsData): Promise<any> {
         try {
             const response = await this.axiosInstance.post(`subscriber/setCustomFields`, data);

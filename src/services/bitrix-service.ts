@@ -117,10 +117,11 @@ export class Bitrix24 {
             if (dealsList.total > 0) {
                 const messageJson = messageBuilder
                     .addTextMessage("Вы уже взяли данную заявку, пожалуйста, ожидайте следующей рассылки")
+                    .build()
 
                 return {
                     result: post_id,
-                    message: messageJson.message
+                    message: messageJson
                 }
             }
 
@@ -135,16 +136,18 @@ export class Bitrix24 {
                 })
                 const messageJson = messageBuilder
                     .addTextMessage("Спасибо! После выполнения задания воспользуйтесь командой /report , что рассказать о своих результатах")
+                    .build()
                 return {
                     result: dealResponse.data.result,
-                    message: {...messageJson.message}
+                    message: messageJson
                 };
             } else {
                 const messageJson = messageBuilder
                     .addTextMessage("При создании заявки возникла проблема. Обратитесь в техническую поддержку: /support")
+                    .build()
                 return {
                     result: dealResponse.data.result,
-                    message: {...messageJson.message}
+                    message: messageJson
                 };
             }
         } catch (error) {

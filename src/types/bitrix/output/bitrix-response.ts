@@ -12,8 +12,50 @@ export interface DealCreatedResponse {
 }
 
 export interface DealsListResult {
-    ID: string,
-    CONTACT_ID: string
+    ID: string;
+    TITLE: string;
+    TYPE_ID: string;
+    STAGE_ID: string;
+    PROBABILITY: null | number;
+    CURRENCY_ID: string;
+    OPPORTUNITY: null | number;
+    IS_MANUAL_OPPORTUNITY: string;
+    TAX_VALUE: null | number;
+    LEAD_ID: null | string;
+    COMPANY_ID: string;
+    CONTACT_ID: string;
+    QUOTE_ID: null | string;
+    BEGINDATE: string;
+    CLOSEDATE: string;
+    ASSIGNED_BY_ID: string;
+    CREATED_BY_ID: string;
+    MODIFY_BY_ID: string;
+    DATE_CREATE: string;
+    DATE_MODIFY: string;
+    OPENED: string;
+    CLOSED: string;
+    COMMENTS: null | string;
+    ADDITIONAL_INFO: null | string;
+    LOCATION_ID: null | string;
+    CATEGORY_ID: number;
+    STAGE_SEMANTIC_ID: string;
+    IS_NEW: string;
+    IS_RECURRING: string;
+    IS_RETURN_CUSTOMER: string;
+    IS_REPEATED_APPROACH: string;
+    SOURCE_ID: null | string;
+    SOURCE_DESCRIPTION: null | string;
+    ORIGINATOR_ID: null | string;
+    ORIGIN_ID: null | string;
+    MOVED_BY_ID: string;
+    MOVED_TIME: string;
+    LAST_ACTIVITY_TIME: string;
+    UTM_SOURCE: null | string;
+    UTM_MEDIUM: null | string;
+    UTM_CAMPAIGN: null | string;
+    UTM_CONTENT: null | string;
+    UTM_TERM: null | string;
+    LAST_ACTIVITY_BY: string;
 }
 
 export type DealsList = {
@@ -52,7 +94,7 @@ export interface DealResult {
     COMMENTS: null | string;
     ADDITIONAL_INFO: null | string;
     LOCATION_ID: null | string;
-    CATEGORY_ID: number;
+    CATEGORY_ID: string;
     STAGE_SEMANTIC_ID: string;
     IS_NEW: string;
     IS_RECURRING: string;

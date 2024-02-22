@@ -1,4 +1,4 @@
-import {IAction, IManychatMessage, IQuickReply} from "../types/manychat/input/input";
+import {IAction, IButton, IManychatMessage, IQuickReply} from "../types/manychat/input/input";
 
 export class MessageBuilder {
     public message: IManychatMessage;
@@ -17,8 +17,8 @@ export class MessageBuilder {
 
     addTextMessage(text: string): MessageBuilder {
         this.message.content.messages.push({
-            "type": "text",
-            "text": text
+            type: "text",
+            text: text
         });
         return this;
     }
@@ -33,10 +33,24 @@ export class MessageBuilder {
         return this;
     }
 
+    addButtonsToTextMessage(buttons: IButton[]): MessageBuilder {
+        const lastMessage = this.message.content.messages[this.message.content.messages.length - 1];
+        if (lastMessage && lastMessage.type === "text") {
+            // Если lastMessage.buttons не определено, инициализируем пустым массивом
+            if (!("buttons" in lastMessage)) {
+                lastMessage["buttons"] = [];
+            }
+            // Добавляем кнопки к последнему текстовому сообщению
+            lastMessage?.buttons?.push(...buttons);
+        }
+        return this;
+    }
+
     build(): IManychatMessage {
         return this.message;
     }
 }
+
 
 // Пример использования
 // const builder = new MessageBuilder();
