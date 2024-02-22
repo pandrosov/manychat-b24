@@ -5,8 +5,74 @@ import {Bitrix24} from "../../services/bitrix-service";
 import ManychatService from "../../services/manychat-service";
 import {BitrixRelation} from "../../types/bitrix/common";
 import {BITRIX_DEAL_STATUS} from "../../helpers/constants";
+import * as dotenv from "dotenv";
+import ManyChatService from "../../services/manychat-service";
+dotenv.config();
 
 export const webhookRouter = Router({})
+const tgToken = process.env.TG_TOKEN
+
+webhookRouter.post(`/bot${tgToken}`, async(req: Request, res: Response) => {
+    try {
+        // !TODO
+        // [+] - отлавливаем события по заполнению данных
+        // [+] - находим пользователя
+        // [] - выставляем chat id в профиль пользователя
+        // [] - проверяем есть ли активная сделка
+        // [] - отправляем сообщение в битрикс или в сделку
+        console.log(req.body.from)
+        res.status(HTTP_CODES_RESPONSE.SUCCESS).send(req.body)
+        // const bitrixService = new Bitrix24()
+        // const manyChatService = new ManyChatService()
+
+        // if ('contact' in msg && msg?.contact?.phone_number !== '') {
+        //     console.log(msg.contact)
+        //     const manyChatUser = await manyChatService.getUserBySystemField(msg?.contact?.phone_number || "")
+        //     const {custom_fields} = manyChatUser
+        //     const bitrixUserId = custom_fields.find(field => field.name === "bitrix_user_id")
+        //
+        //     let comment = ""
+        //
+        //
+        //     if (bitrixUserId) {
+        //         if (msg.text && msg.from) {
+        //             comment = msg.text
+        //         }
+        //
+        //         if (msg.photo && msg.from) {
+        //             msg.photo.forEach((photo) => {
+        //                 const photoId = photo.file_id;
+        //
+        //                 bot.getFileLink(photoId).then((link) => {
+        //                     comment = comment + link + " "
+        //                 });
+        //             });
+        //         }
+        //
+        //
+        //         const activeReportId = custom_fields.find(field => field.name === "profile_report_deal")?.value as (string | number) || ""
+        //         if (activeReportId.toString()) {
+        //             const newTimeLineDeal = await bitrixService.addEntityComment("deal", activeReportId, comment)
+        //             if (newTimeLineDeal.result) {
+        //                 console.log("Add comment to deal")
+        //             } else {
+        //                 console.log(`Not working bitrixUserId=${bitrixUserId} activeDeal=${activeReportId}`)
+        //             }
+        //         } else {
+        //             const newTimeLineDContact = await bitrixService.addEntityComment("contact", bitrixUserId.toString(), comment)
+        //             if (newTimeLineDContact.result) {
+        //                 console.log("Add comment to contact")
+        //             } else {
+        //                 console.log(`Not working bitrixUserId=${bitrixUserId} activeDeal=${activeReportId}`)
+        //             }
+        //         }
+        //     }
+        // }
+    } catch (error) {
+        console.error(error)
+        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST)
+    }
+})
 
 webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: Response) => {
     try {

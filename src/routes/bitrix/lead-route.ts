@@ -4,7 +4,6 @@ import {LeadRequest} from "../../types/bitrix/input/input";
 import {Bitrix24} from "../../services/bitrix-service";
 
 export const leadRoute = Router({})
-
 leadRoute.post('/add', async (req: RequestWithBody<LeadRequest>, res: Response)=> {
     try {
         const bitrix = new Bitrix24()
