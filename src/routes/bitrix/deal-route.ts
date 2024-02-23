@@ -14,19 +14,22 @@ dealRouter.get('/:id/all', async (req: RequestWithBodyAndParams<DealListParams, 
         const id = req.params.id
         const bitrix = new Bitrix24()
         const dealButtonFlow = process.env.MANYCHAT_DEAL_BUTTON_FLOW || "content20240222162533_755256"
-        const filter = {
+        const query = {
             filter: {
                 ["=" + BitrixRelation.DEAL_CONTACT_ID]: id
-            }
+            },
+            SELECT: ["*", BitrixRelation.DEAL_POST_ID]
         }
         const messageBuilder = new MessageBuilder()
-        const dealsList = await bitrix.getUserDeals(filter)
+        const dealsList = await bitrix.getUserDeals(query)
         if(dealsList.total === 0) {
             const mcMessage = messageBuilder.addTextMessage("У вас нет активых сделок для отправки отчета").build()
             res.status(HTTP_CODES_RESPONSE.SUCCESS).send(mcMessage)
         } else {
             const dealButton:IButton[] = []
+            let textMessage = "";
             dealsList.result.forEach(deal => {
+                textMessage = `${textMessage} #${deal[BitrixRelation.DEAL_POST_ID]} \n`
                 dealButton.push({
                     "type": "flow",
                     "caption": `Рассылка ${deal[BitrixRelation.DEAL_ID]}`,
@@ -42,7 +45,7 @@ dealRouter.get('/:id/all', async (req: RequestWithBodyAndParams<DealListParams, 
             })
 
             const messageJson = messageBuilder
-                .addTextMessage("Ваши активные заявки")
+                .addTextMessage("Ваши активные заявки \n" + textMessage)
                 .addButtonsToTextMessage(dealButton)
                 .build()
 

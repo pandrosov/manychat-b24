@@ -112,7 +112,6 @@ export class Bitrix24 {
             const manyChat = new ManyChatService()
             const {custom_fields} = await manyChat.getUserDataById(telegramId)
             const bitrixActiveDeals = custom_fields.find(item => item.id === 10490344)?.value as Array<number | string> || [];
-            const bitrixClosedDeals = custom_fields.find(item => item.id === 10490344)?.value as Array<number | string> || [];
 
             if (dealsList.total > 0) {
                 const messageJson = messageBuilder
@@ -129,7 +128,7 @@ export class Bitrix24 {
             const dealResponse = await axios.post(`${this.webhookUrlProd}crm.deal.add`, {fields: mappingBitrixDeal});
 
             if (dealResponse.data.result) {
-                const setField = await manyChat.setUserField({
+                await manyChat.setUserField({
                     subscriber_id: telegramId,
                     field_name: "bitrix_active_deals",
                     field_value: [...bitrixActiveDeals, dealResponse.data.result]
@@ -155,9 +154,9 @@ export class Bitrix24 {
         }
     }
 
-    async getUserDeals(filter: any): Promise<DealsList> {
+    async getUserDeals(query: any): Promise<DealsList> {
         try {
-            const dealsResponse = await axios.post(`${this.webhookUrlProd}crm.deal.list`, filter);
+            const dealsResponse = await axios.post(`${this.webhookUrlProd}crm.deal.list`, query);
 
             return dealsResponse.data
         } catch (error) {

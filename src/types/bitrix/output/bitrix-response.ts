@@ -56,6 +56,7 @@ export interface DealsListResult {
     UTM_CONTENT: null | string;
     UTM_TERM: null | string;
     LAST_ACTIVITY_BY: string;
+    UF_CRM_1706873714861: string;
 }
 
 export type DealsList = {
