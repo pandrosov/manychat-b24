@@ -10,18 +10,18 @@ import ManyChatService from "../../services/manychat-service";
 dotenv.config();
 
 export const webhookRouter = Router({})
-const tgToken = process.env.TG_TOKEN
+// const tgToken = process.env.TG_TOKEN
 
-webhookRouter.post(`/bot${tgToken}`, async(req: Request, res: Response) => {
-    try {
+// webhookRouter.post(`/bot${tgToken}`, async(req: Request, res: Response) => {
+//     try {
         // !TODO
         // [+] - отлавливаем события по заполнению данных
         // [+] - находим пользователя
         // [] - выставляем chat id в профиль пользователя
         // [] - проверяем есть ли активная сделка
         // [] - отправляем сообщение в битрикс или в сделку
-        console.log(req.body.from)
-        res.status(HTTP_CODES_RESPONSE.SUCCESS).send(req.body)
+        // console.log(req.body.from)
+        // res.status(HTTP_CODES_RESPONSE.SUCCESS).send(req.body)
         // const bitrixService = new Bitrix24()
         // const manyChatService = new ManyChatService()
 
@@ -68,11 +68,11 @@ webhookRouter.post(`/bot${tgToken}`, async(req: Request, res: Response) => {
         //         }
         //     }
         // }
-    } catch (error) {
-        console.error(error)
-        res.status(HTTP_CODES_RESPONSE.BAD_REQUEST)
-    }
-})
+//     } catch (error) {
+//         console.error(error)
+//         res.status(HTTP_CODES_RESPONSE.BAD_REQUEST)
+//     }
+// })
 
 webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: Response) => {
     try {
