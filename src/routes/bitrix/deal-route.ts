@@ -5,12 +5,15 @@ import {Bitrix24} from "../../services/bitrix-service";
 import {BitrixRelation} from "../../types/bitrix/common";
 import {MessageBuilder} from "../../helpers/manychat-messages";
 import {IButton} from "../../types/manychat/input/input";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 export const dealRouter = Router({})
 dealRouter.get('/:id/all', async (req: RequestWithBodyAndParams<DealListParams, DealListReq>, res: Response) => {
     try {
         const id = req.params.id
         const bitrix = new Bitrix24()
+        const dealButtonFlow = process.env.MANYCHAT_DEAL_BUTTON_FLOW || "content20240222162533_755256"
         const filter = {
             filter: {
                 ["=" + BitrixRelation.DEAL_CONTACT_ID]: id
@@ -27,7 +30,7 @@ dealRouter.get('/:id/all', async (req: RequestWithBodyAndParams<DealListParams, 
                 dealButton.push({
                     "type": "flow",
                     "caption": deal[BitrixRelation.DEAL_ID],
-                    "target": "content20240221095701_631322",
+                    "target": dealButtonFlow,
                     "actions": [
                         {
                             "action": "set_field_value",
@@ -45,8 +48,6 @@ dealRouter.get('/:id/all', async (req: RequestWithBodyAndParams<DealListParams, 
 
             res.status(HTTP_CODES_RESPONSE.SUCCESS).send(messageJson)
         }
-
-        res.status(200).send({result: dealsList.result})
     } catch (error) {
         res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({
             status: "error",
