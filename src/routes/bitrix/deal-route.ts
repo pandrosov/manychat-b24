@@ -1,5 +1,5 @@
-import {Router, Request, Response} from "express";
-import {HTTP_CODES_RESPONSE, RequestWithBody, RequestWithBodyAndParams, RequestWithParams} from "../../types/common";
+import {Router, Response} from "express";
+import {HTTP_CODES_RESPONSE, RequestWithBody, RequestWithBodyAndParams} from "../../types/common";
 import {DealListParams, DealListReq, ManychatDealData} from "../../types/bitrix/input/input";
 import {Bitrix24} from "../../services/bitrix-service";
 import {BitrixRelation} from "../../types/bitrix/common";
@@ -29,7 +29,7 @@ dealRouter.get('/:id/all', async (req: RequestWithBodyAndParams<DealListParams, 
             dealsList.result.forEach(deal => {
                 dealButton.push({
                     "type": "flow",
-                    "caption": deal[BitrixRelation.DEAL_ID],
+                    "caption": `Рассылка ${deal[BitrixRelation.DEAL_ID]}`,
                     "target": dealButtonFlow,
                     "actions": [
                         {
