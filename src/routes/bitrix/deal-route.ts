@@ -29,10 +29,10 @@ dealRouter.get('/:id/all', async (req: RequestWithBodyAndParams<DealListParams, 
             const dealButton:IButton[] = []
             let textMessage = "";
             dealsList.result.forEach(deal => {
-                textMessage = `${textMessage} #${deal[BitrixRelation.DEAL_POST_ID]} \n`
+                textMessage = `${textMessage} #deal${deal[BitrixRelation.DEAL_POST_ID]} \n`
                 dealButton.push({
                     "type": "flow",
-                    "caption": `Рассылка ${deal[BitrixRelation.DEAL_ID]}`,
+                    "caption": `Рассылка #deal${deal[BitrixRelation.DEAL_POST_ID]}`,
                     "target": dealButtonFlow,
                     "actions": [
                         {
