@@ -4,8 +4,16 @@ import {ManychatUserData} from "../../types/bitrix/input/input";
 import {Bitrix24} from "../../services/bitrix-service";
 import {type} from "os";
 import {MessageBuilder} from "../../helpers/manychat-messages";
+import {validateAndFormatCardNumber} from "../../helpers/helper";
 
 export const contactRoute = Router({})
+
+contactRoute.post('/validate', (req: RequestWithBody<{last_input: string}>, res: Response) => {
+    const lastInputCard = req.body.last_input
+    const [isValid, card] = validateAndFormatCardNumber(lastInputCard)
+    console.log(isValid, card)
+    res.status(HTTP_CODES_RESPONSE.SUCCESS).send({card: card})
+})
 
 contactRoute.post('/add', async (req: RequestWithBody<ManychatUserData>, res: Response) => {
     try {

@@ -149,10 +149,10 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
                     let filteredClosedDeals: (string | number)[] = bitrixClosedDeals
 
                     // если сделка не имеет положительного статуса
-                    if(!DEAL_WIN_STATUSES.includes(reqId)) {
+                    if(!DEAL_WIN_STATUSES.includes(status)) {
                         if(filteredClosedDeals.includes(+reqId)) {
                             // то возвращаем closed в active
-                            filteredClosedDeals = bitrixClosedDeals.filter(item => {
+                            filteredClosedDeals = filteredClosedDeals.filter(item => {
                                 if(item === +reqId) {
                                     filteredActiveDeals.push(item)
                                     return false
@@ -165,7 +165,7 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
                         // если сделка закрыта или проверен отчет
                         if(filteredActiveDeals.includes(+reqId)) {
                             // то мы меняем статус на
-                            filteredActiveDeals = bitrixClosedDeals.filter(item => {
+                            filteredActiveDeals = filteredActiveDeals.filter(item => {
                                 if(item === +reqId) {
                                     filteredClosedDeals.push(item)
                                     return false;
