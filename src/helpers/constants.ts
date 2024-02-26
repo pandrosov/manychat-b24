@@ -25,10 +25,16 @@ export const BITRIX_DEAL_STATUS = {
     failed: "C35:LOSE"
 }
 
+export const DEAL_WIN_STATUSES:string[] = [
+    BITRIX_DEAL_STATUS.checked,
+    BITRIX_DEAL_STATUS.failed,
+    BITRIX_DEAL_STATUS.success
+]
+
 export const BITRIX_CONST = {
     CONTACT_TYPE: "UC_2HCWL8",
-    CONTACT_ASSIGNED: 26355,
-    DEAL_ASSIGNED: 26355,
+    CONTACT_ASSIGNED: 27377, // Gleb
+    DEAL_ASSIGNED: 27377, // Gleb
     DEAL_TYPE: 1,
     DEAL_CATEGORY: 35
 }

@@ -43,7 +43,8 @@ export class Bitrix24 {
             const {custom_fields} = contactData
             const { bitrix_user_id} = custom_fields
             const userData = bitrixContactConvert(contactData)
-
+            //!TODO
+            // [] - валидация данных карточек (на 16 символов)
             if (!bitrix_user_id) {
                 const response: AxiosResponse<BitrixResponse, any> = await axios.post(`${this.webhookUrlProd}crm.contact.add`, {fields: userData});
                 return response.data.result

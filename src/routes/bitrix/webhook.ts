@@ -4,7 +4,7 @@ import {WebhookBody} from "../../types/webhook";
 import {Bitrix24} from "../../services/bitrix-service";
 import ManychatService from "../../services/manychat-service";
 import {BitrixRelation} from "../../types/bitrix/common";
-import {BITRIX_DEAL_STATUS} from "../../helpers/constants";
+import {BITRIX_DEAL_STATUS, DEAL_WIN_STATUSES} from "../../helpers/constants";
 import * as dotenv from "dotenv";
 import ManyChatService from "../../services/manychat-service";
 dotenv.config();
@@ -95,9 +95,9 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
                     let filteredActiveDeals: (string|number)[] = []
                     let filteredClosedDeals: (string|number)[] = []
 
-                    if(bitrixActiveDeals.includes(reqId) || bitrixClosedDeals.includes(reqId)) {
-                        filteredActiveDeals = bitrixActiveDeals.filter(deal => deal !== reqId)
-                        filteredClosedDeals = bitrixClosedDeals.filter(deal => deal !== reqId)
+                    if(bitrixActiveDeals.includes(+reqId) || bitrixClosedDeals.includes(+reqId)) {
+                        filteredActiveDeals = bitrixActiveDeals.filter(deal => deal !== +reqId)
+                        filteredClosedDeals = bitrixClosedDeals.filter(deal => deal !== +reqId)
                     }
 
                     const updManyChatUser = await manyChat.setCustomFieldsForUser({
@@ -145,14 +145,16 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
                     const {custom_fields} = manyChatUser
                     const bitrixActiveDeals = custom_fields.find(item => item.name === "bitrix_active_deals")?.value as Array<number | string> || [];
                     const bitrixClosedDeals = custom_fields.find(item => item.name === "bitrix_closed_deals")?.value as Array<number | string> || [];
+                    let filteredActiveDeals: (string | number)[] = bitrixActiveDeals
+                    let filteredClosedDeals: (string | number)[] = bitrixClosedDeals
 
                     // если сделка не имеет положительного статуса
-                    if(status !== BITRIX_DEAL_STATUS.checked || status !== BITRIX_DEAL_STATUS.success || status !== BITRIX_DEAL_STATUS.failed) {
-                        if(bitrixClosedDeals.includes(reqId)) {
+                    if(!DEAL_WIN_STATUSES.includes(reqId)) {
+                        if(filteredClosedDeals.includes(+reqId)) {
                             // то возвращаем closed в active
-                            const filteredClosedDeals = bitrixClosedDeals.filter(item => {
-                                if(item === reqId) {
-                                    bitrixActiveDeals.push(item)
+                            filteredClosedDeals = bitrixClosedDeals.filter(item => {
+                                if(item === +reqId) {
+                                    filteredActiveDeals.push(item)
                                     return false
                                 }
 
@@ -161,15 +163,15 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
                         }
                     } else {
                         // если сделка закрыта или проверен отчет
-                        if(bitrixActiveDeals.includes(reqId)) {
+                        if(filteredActiveDeals.includes(+reqId)) {
                             // то мы меняем статус на
-                            const filteredClosedDeals = bitrixActiveDeals.filter(item => {
-                                if(item === reqId) {
-                                    bitrixClosedDeals.push(item)
-                                    return false
+                            filteredActiveDeals = bitrixClosedDeals.filter(item => {
+                                if(item === +reqId) {
+                                    filteredClosedDeals.push(item)
+                                    return false;
                                 }
 
-                                return true
+                                return true;
                             })
                         }
                     }
@@ -179,11 +181,11 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
                         fields: [
                             {
                                 field_name: 'bitrix_active_deals',
-                                field_value: bitrixActiveDeals
+                                field_value: filteredActiveDeals
                             },
                             {
                                 field_name: 'bitrix_closed_deals',
-                                field_value: bitrixClosedDeals
+                                field_value: filteredClosedDeals
                             }
                         ]
                     })

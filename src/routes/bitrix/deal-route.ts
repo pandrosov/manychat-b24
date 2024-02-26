@@ -6,6 +6,7 @@ import {BitrixRelation} from "../../types/bitrix/common";
 import {MessageBuilder} from "../../helpers/manychat-messages";
 import {IButton} from "../../types/manychat/input/input";
 import * as dotenv from "dotenv";
+import {BITRIX_DEAL_STATUS, DEAL_WIN_STATUSES} from "../../helpers/constants";
 dotenv.config();
 
 export const dealRouter = Router({})
@@ -29,19 +30,21 @@ dealRouter.get('/:id/all', async (req: RequestWithBodyAndParams<DealListParams, 
             const dealButton:IButton[] = []
             let textMessage = "";
             dealsList.result.forEach(deal => {
-                textMessage = `${textMessage} #deal${deal[BitrixRelation.DEAL_POST_ID]} \n`
-                dealButton.push({
-                    "type": "flow",
-                    "caption": `Рассылка #deal${deal[BitrixRelation.DEAL_POST_ID]}`,
-                    "target": dealButtonFlow,
-                    "actions": [
-                        {
-                            "action": "set_field_value",
-                            "field_name": "profile_report_deal",
-                            "value": deal[BitrixRelation.DEAL_ID]
-                        }
-                    ]
-                })
+                if(!DEAL_WIN_STATUSES.includes(deal.STAGE_ID)) {
+                    textMessage = `${textMessage} #deal${deal[BitrixRelation.DEAL_POST_ID]} \n`
+                    dealButton.push({
+                        "type": "flow",
+                        "caption": `Рассылка #deal${deal[BitrixRelation.DEAL_POST_ID]}`,
+                        "target": dealButtonFlow,
+                        "actions": [
+                            {
+                                "action": "set_field_value",
+                                "field_name": "profile_report_deal",
+                                "value": deal[BitrixRelation.DEAL_ID]
+                            }
+                        ]
+                    })
+                }
             })
 
             const messageJson = messageBuilder
