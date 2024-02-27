@@ -129,13 +129,22 @@ export class Bitrix24 {
             const dealResponse = await axios.post(`${this.webhookUrlProd}crm.deal.add`, {fields: mappingBitrixDeal});
 
             if (dealResponse.data.result) {
-                await manyChat.setUserField({
+                await manyChat.setCustomFieldsForUser({
                     subscriber_id: telegramId,
-                    field_name: "bitrix_active_deals",
-                    field_value: [...bitrixActiveDeals, dealResponse.data.result]
+                    fields: [
+                        {
+                            field_name: 'bitrix_active_deals',
+                            field_value: [...bitrixActiveDeals, dealResponse.data.result]
+                        },
+                        {
+                            field_name: 'profile_isDeal',
+                            field_value: true
+                        }
+                    ]
                 })
                 const messageJson = messageBuilder
-                    .addTextMessage("Спасибо! После выполнения задания воспользуйтесь командой /report , что рассказать о своих результатах")
+                    .addTextMessage("Спасибо)\n" +
+                        "После выполнения задания воспользуйся командой /report, чтобы рассказать про свои результаты")
                     .build()
                 return {
                     result: dealResponse.data.result,

@@ -22,7 +22,7 @@ export interface ISetCustomFieldsData {
     fields: Array<{
         field_name: string,
         field_id?: number,
-        field_value: string | Date | number | Array<number | string>
+        field_value: string | Date | number | Array<number | string> | Boolean
     }>
 }
 export interface IQuickReply {

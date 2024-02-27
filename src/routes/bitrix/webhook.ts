@@ -110,6 +110,10 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
                             {
                                 field_name: 'bitrix_closed_deals',
                                 field_value: filteredClosedDeals
+                            },
+                            {
+                                field_name: "profile_isDeal",
+                                field_value: !!filteredActiveDeals
                             }
                         ]
                     })
@@ -186,6 +190,10 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
                             {
                                 field_name: 'bitrix_closed_deals',
                                 field_value: filteredClosedDeals
+                            },
+                            {
+                                field_name: "profile_isDeal",
+                                field_value: !!filteredActiveDeals
                             }
                         ]
                     })

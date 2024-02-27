@@ -28,7 +28,7 @@ dealRouter.get('/:id/all', async (req: RequestWithBodyAndParams<DealListParams, 
         const activeDeals = dealsList.result.filter(deal => !DEAL_WIN_STATUSES.includes(deal.STAGE_ID))
 
         if(activeDeals.length === 0) {
-            const mcMessage = messageBuilder.addTextMessage("У вас нет актуальных заданий.").build()
+            const mcMessage = messageBuilder.addTextMessage("У тебя нет актуальных заданий.").build()
             res.status(HTTP_CODES_RESPONSE.SUCCESS).send(mcMessage)
         } else {
             const dealButton:IButton[] = []
@@ -50,7 +50,7 @@ dealRouter.get('/:id/all', async (req: RequestWithBodyAndParams<DealListParams, 
             })
 
             const messageJson = messageBuilder
-                .addTextMessage("Ваши активные заявки \n" + textMessage)
+                .addTextMessage("Твои актуальные задания \n" + textMessage)
                 .addButtonsToTextMessage(dealButton)
                 .build()
 

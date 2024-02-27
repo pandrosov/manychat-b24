@@ -23,15 +23,15 @@ contactRoute.post('/add', async (req: RequestWithBody<ManychatUserData>, res: Re
 
         if(response === 1) {
             const messageJson = builder
-                .addTextMessage("Отлично, Ваши данные были изменены")
+                .addTextMessage("Отлично, твои данные были изменены.")
                 .build()
             res.status(HTTP_CODES_RESPONSE.SUCCESS).send(messageJson)
             return
         } else if (response > 1) {
             const messageJson = builder
-                .addTextMessage("Отлично! Мы заполнили профиль Самого лучшего амбассадора. Если какие-то твои контактные данные изменятся, ты всегда можешь обновить информацию нажав на кнопку “Мой профиль”. \n" +
+                .addTextMessage("Отлично! Мы заполнили профиль Самого лучшего амбассадора. Если какие-то твои контактные данные изменятся, ты всегда можешь обновить информацию нажав на кнопку \"Меню\" - “Профиль”.\n" +
                     "\n" +
-                    "Если у тебя появятся какие-либо вопросы, ты можешь задать нам их нажав на кнопку /support")
+                    "Если у тебя появятся какие-либо вопросы, ты можешь задать нам их нажав на кнопку \"Меню\" - “Поддержка”.")
                 .addAction({
                     action: "set_field_value",
                     field_name: "bitrix_user_id",
