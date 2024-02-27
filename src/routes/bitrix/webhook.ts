@@ -113,7 +113,7 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
                             },
                             {
                                 field_name: "profile_isDeal",
-                                field_value: !!filteredActiveDeals
+                                field_value: !!filteredActiveDeals.length
                             }
                         ]
                     })
@@ -193,7 +193,7 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
                             },
                             {
                                 field_name: "profile_isDeal",
-                                field_value: !!filteredActiveDeals
+                                field_value: !!filteredActiveDeals.length
                             }
                         ]
                     })
