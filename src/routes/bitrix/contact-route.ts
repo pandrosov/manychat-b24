@@ -1,8 +1,7 @@
-import {Router, Request, Response} from "express";
+import {Router, Response} from "express";
 import {HTTP_CODES_RESPONSE, RequestWithBody} from "../../types/common";
 import {ManychatUserData} from "../../types/bitrix/input/input";
 import {Bitrix24} from "../../services/bitrix-service";
-import {type} from "os";
 import {MessageBuilder} from "../../helpers/manychat-messages";
 import {validateAndFormatCardNumber} from "../../helpers/helper";
 
@@ -29,9 +28,11 @@ contactRoute.post('/add', async (req: RequestWithBody<ManychatUserData>, res: Re
             return
         } else if (response > 1) {
             const messageJson = builder
-                .addTextMessage("Отлично! Мы заполнили профиль Самого лучшего амбассадора. Если какие-то твои контактные данные изменятся, ты всегда можешь обновить информацию нажав на кнопку \"Меню\" - “Профиль”.\n" +
+                .addTextMessage("Отлично! Мы заполнили профиль Самого лучшего амбассадора. Если какие-то твои контактные данные изменятся, ты всегда можешь обновить информацию нажав на кнопку “Мой профиль”.\n" +
                     "\n" +
-                    "Если у тебя появятся какие-либо вопросы, ты можешь задать нам их нажав на кнопку \"Меню\" - “Поддержка”.")
+                    "Если у тебя появятся какие-либо вопросы, ты можешь задать нам их нажав на кнопку /support\n" +
+                    "\n" +
+                    "Скоро мы порадуем тебя новыми классными рассылками)")
                 .addAction({
                     action: "set_field_value",
                     field_name: "bitrix_user_id",
