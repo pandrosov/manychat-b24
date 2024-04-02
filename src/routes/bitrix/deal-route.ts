@@ -40,11 +40,11 @@ dealRouter.get('/:id/all', async (req: RequestWithBodyAndParams<DealListParams, 
                     "caption": `#Рассылка${deal[BitrixRelation.DEAL_POST_ID]}`,
                     "target": dealButtonFlow,
                     "actions": [
-                        {
-                            "action": "set_field_value",
-                            "field_name": "profile_report_deal",
-                            "value": deal[BitrixRelation.DEAL_ID]
-                        }
+                        // {
+                        //     "action": "set_field_value",
+                        //     "field_name": "profile_report_deal",
+                        //     "value": deal[BitrixRelation.DEAL_ID]
+                        // }
                     ]
                 })
             })
