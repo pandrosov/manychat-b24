@@ -31,22 +31,29 @@ dealRouter.get('/:id/all', async (req: RequestWithBodyAndParams<DealListParams, 
             const mcMessage = messageBuilder.addTextMessage("У тебя нет актуальных заданий.").build()
             res.status(HTTP_CODES_RESPONSE.SUCCESS).send(mcMessage)
         } else {
-            const dealButton:IButton[] = []
+            const dealButton:IButton[] = [
+                {
+                    "type": "flow",
+                    "caption": `Отправить отчет`,
+                    "target": dealButtonFlow,
+                    "actions": []
+                }
+            ]
             let textMessage = "";
             activeDeals.forEach(deal => {
                 textMessage = `${textMessage} #Рассылка${deal[BitrixRelation.DEAL_POST_ID]} \n`
-                dealButton.push({
-                    "type": "flow",
-                    "caption": `#Рассылка${deal[BitrixRelation.DEAL_POST_ID]}`,
-                    "target": dealButtonFlow,
-                    "actions": [
-                        // {
-                        //     "action": "set_field_value",
-                        //     "field_name": "profile_report_deal",
-                        //     "value": deal[BitrixRelation.DEAL_ID]
-                        // }
-                    ]
-                })
+                // dealButton.push({
+                //     "type": "flow",
+                //     "caption": `#Рассылка${deal[BitrixRelation.DEAL_POST_ID]}`,
+                //     "target": dealButtonFlow,
+                //     "actions": [
+                //         {
+                //             "action": "set_field_value",
+                //             "field_name": "profile_report_deal",
+                //             "value": deal[BitrixRelation.DEAL_ID]
+                //         }
+                //     ]
+                // })
             })
 
             const messageJson = messageBuilder
