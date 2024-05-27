@@ -4,40 +4,60 @@ import {BitrixUserResponse} from "../types/bitrix/output/bitrix-response";
 import {ConvertedBitrixContact} from "../types/bitrix/output/output";
 import {BITRIX_CONST, bitrixIMArr, bitrixPhoneEmailArr, bitrixValues, SOCIAL_TYPE} from "./constants";
 
-const fillMultyFieldsBitrix = (socials: string, phone: string) => {
-    const socialsOutput: BitrixMultiplyField[] = [];
-    const phoneOutput: BitrixMultiplyField[] = [];
+const extractBaseUrl = (url) => {
+    const match = url.match(/^(https?:\/\/[^?]+)/);
+    return match ? match[1] : url;
+};
 
-    const socialUrls = socials?.split(",") || [];
-    socialUrls.forEach(url => {
-        const socialType = url.includes("instagram.com") ? SOCIAL_TYPE.INSTAGRAM :
-            url.includes("t.me") ? SOCIAL_TYPE.TELEGRAM :
-                url.includes("tiktok.com") ? "OTHER" : "OTHER";
-        if (url.includes("instagram.com")) {
-            url = extractInstUsername(url)
+const determineSocialType = (url) => {
+    if (url.includes("instagram.com")) {
+        return SOCIAL_TYPE.INSTAGRAM;
+    } else if (url.includes("t.me")) {
+        return SOCIAL_TYPE.TELEGRAM;
+    } else {
+        return SOCIAL_TYPE.OTHER;
+    }
+};
+
+const extractInstUsername = (url) => {
+    const match = url.match(/instagram\.com\/([^/?]+)/);
+    return match ? `https://instagram.com/${match[1]}` : url;
+};
+
+const findUrlsInString = (string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return string.match(urlRegex) || [];
+};
+
+const fillMultyFieldsBitrix = (socials, phone) => {
+    const socialsOutput = [];
+    const phoneOutput = [];
+
+    const socialUrls = findUrlsInString(socials);
+    socialUrls.forEach(rawUrl => {
+        let url = extractBaseUrl(rawUrl.trim());
+        let socialType = determineSocialType(url);
+
+        if (socialType === SOCIAL_TYPE.INSTAGRAM) {
+            url = extractInstUsername(url);
         }
+
         socialsOutput.push({
-            ...bitrixIMArr,
             VALUE_TYPE: socialType,
             VALUE: url
         });
     });
 
     phoneOutput.push({
-        ...bitrixPhoneEmailArr,
         VALUE: phone,
         TYPE_ID: "PHONE"
-    })
+    });
 
     return {
         socialUrls: socialsOutput,
         phones: phoneOutput
-    }
-}
-
-const extractInstUsername = (url: string): string => {
-    return (url.match(/instagram\.com\/([^/?]+)/) || [])[1] || "Невалидная ссылка";
-}
+    };
+};
 
 export const bitrixContactConvert = (inputData: ManychatUserData): ConvertedBitrixContact => {
     const telegramId = inputData.id

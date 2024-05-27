@@ -4,6 +4,7 @@ import {BitrixMultiplyField} from "../types/bitrix/common";
 export const SOCIAL_TYPE = {
     INSTAGRAM: "INSTAGRAM",
     TELEGRAM: "TELEGRAM",
+    OTHER: "OTHER"
 };
 
 export const bitrixValues: Mapping = {
