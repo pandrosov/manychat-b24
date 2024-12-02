@@ -13,7 +13,7 @@ export function getKeyByValue(obj: Record<string, string>, value: string): strin
     return entry ? entry[0] : undefined; // Возвращаем ключ, если найдено
 }
 
-export function getDealFlow(pageId: string): string | undefined {
+export function getDealFlow(pageId: string): any {
     // Генерируем ключ для переменной окружения на основе pageId
     const tokenEnv = `MANYCHAT_DEAL_BUTTON_FLOW_${pageId}`;
 

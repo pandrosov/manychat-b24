@@ -18,7 +18,6 @@ import {MessageBuilder} from "../helpers/manychat-messages";
 import {ConvertedBitrixContact} from "../types/bitrix/output/output";
 
 export class Bitrix24 {
-    private readonly webhookUrl: string;
     private readonly webhookUrlProd: string;
 
     constructor() {

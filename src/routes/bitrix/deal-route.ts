@@ -8,6 +8,7 @@ import {IButton} from "../../types/manychat/input/input";
 import * as dotenv from "dotenv";
 import {BITRIX_DEAL_STATUS, DEAL_WIN_STATUSES} from "../../helpers/constants";
 import {getDealFlow} from "../../helpers/helper";
+import {DealsListResult} from "../../types/bitrix/output/bitrix-response";
 dotenv.config();
 
 export const dealRouter = Router({})
@@ -17,7 +18,7 @@ dealRouter.get('/:page_id/:id/all', async (req: RequestWithBodyAndParams<DealLis
         const pageId = req.params.page_id
         const buttonFlow = getDealFlow(pageId)
         const bitrix = new Bitrix24()
-        const dealButtonFlow = buttonFlow
+        const dealButtonFlow : string = buttonFlow
         const query = {
             filter: {
                 ["=" + BitrixRelation.DEAL_CONTACT_ID]: id
@@ -28,7 +29,9 @@ dealRouter.get('/:page_id/:id/all', async (req: RequestWithBodyAndParams<DealLis
         // !TODO
         // [] - передать статусы
         const dealsList = await bitrix.getUserDeals(query)
-        const activeDeals = dealsList.result.filter(deal => !DEAL_WIN_STATUSES.includes(deal.STAGE_ID))
+        const activeDeals = dealsList.result.filter((deal: DealsListResult) => {
+            return !DEAL_WIN_STATUSES.includes(deal.STAGE_ID.split(":")[1]) && deal[BitrixRelation.DEAL_POST_ID]
+        })
 
         if(activeDeals.length === 0) {
             const mcMessage = messageBuilder.addTextMessage("У тебя нет актуальных заданий.").build()
@@ -45,18 +48,6 @@ dealRouter.get('/:page_id/:id/all', async (req: RequestWithBodyAndParams<DealLis
             let textMessage = "";
             activeDeals.forEach(deal => {
                 textMessage = `${textMessage} #Рассылка${deal[BitrixRelation.DEAL_POST_ID]} \n`
-                // dealButton.push({
-                //     "type": "flow",
-                //     "caption": `#Рассылка${deal[BitrixRelation.DEAL_POST_ID]}`,
-                //     "target": dealButtonFlow,
-                //     "actions": [
-                //         {
-                //             "action": "set_field_value",
-                //             "field_name": "profile_report_deal",
-                //             "value": deal[BitrixRelation.DEAL_ID]
-                //         }
-                //     ]
-                // })
             })
 
             const messageJson = messageBuilder
