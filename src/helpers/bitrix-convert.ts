@@ -4,12 +4,12 @@ import {BitrixUserResponse} from "../types/bitrix/output/bitrix-response";
 import {ConvertedBitrixContact} from "../types/bitrix/output/output";
 import {BITRIX_CONST, bitrixIMArr, bitrixPhoneEmailArr, bitrixValues, SOCIAL_TYPE} from "./constants";
 
-const extractBaseUrl = (url) => {
+const extractBaseUrl = (url:string) => {
     const match = url.match(/^(https?:\/\/[^?]+)/);
     return match ? match[1] : url;
 };
 
-const determineSocialType = (url) => {
+const determineSocialType = (url:string) => {
     if (url.includes("instagram.com")) {
         return SOCIAL_TYPE.INSTAGRAM;
     } else if (url.includes("t.me")) {
@@ -19,19 +19,19 @@ const determineSocialType = (url) => {
     }
 };
 
-const extractInstUsername = (url) => {
+const extractInstUsername = (url:string) => {
     const match = url.match(/instagram\.com\/([^/?]+)/);
     return match ? `https://instagram.com/${match[1]}` : url;
 };
 
-const findUrlsInString = (string) => {
+const findUrlsInString = (string:string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     return string.match(urlRegex) || [];
 };
 
-const fillMultyFieldsBitrix = (socials, phone) => {
-    const socialsOutput = [];
-    const phoneOutput = [];
+const fillMultyFieldsBitrix = (socials:string, phone:string) => {
+    const socialsOutput: any[] = [];
+    const phoneOutput: any[] = [];
 
     const socialUrls = findUrlsInString(socials);
     socialUrls.forEach(rawUrl => {
@@ -60,13 +60,15 @@ const fillMultyFieldsBitrix = (socials, phone) => {
 };
 
 export const bitrixContactConvert = (inputData: ManychatUserData): ConvertedBitrixContact => {
-    const telegramId = inputData.id
+    const {id: telegramId, page_id: pageId} = inputData
     const profile_phone = inputData.phone
     const {
         profile_name,
         profile_socials,
         profile_address,
         profile_card,
+        profile_dob,
+        profile_fio_latin,
         bitrix_user_category,
         bitrix_user_region
     } = inputData.custom_fields
@@ -75,9 +77,11 @@ export const bitrixContactConvert = (inputData: ManychatUserData): ConvertedBitr
     const {socialUrls: socials, phones: phone} = fillMultyFieldsBitrix(profile_socials, profile_phone)
 
     return {
-        [BitrixRelation.CONTACT_TYPE_ID]: BITRIX_CONST.CONTACT_TYPE,
+        [BitrixRelation.CONTACT_TYPE_ID]: BITRIX_CONST.CONTACT_TYPE[pageId],
         [BitrixRelation.CONTACT_NAME]: profile_name,
         [BitrixRelation.CONTACT_PHONE]: phone,
+        [BitrixRelation.CONTACT_DOB]: profile_dob,
+        [BitrixRelation.CONTACT_FIO_LATIN]: profile_fio_latin ?? "",
         [BitrixRelation.CONTACT_ADDRESS]: fact_address ? fact_address : profile_address,
         [BitrixRelation.CONTACT_OTH_ADDRESS]: pvz_address ? pvz_address : "",
         [BitrixRelation.CONTACT_CATEGORY]: bitrixValues[bitrix_user_category],
@@ -134,6 +138,7 @@ export const bitrixLeadConvert = (leadData: LeadRequest): any => {
 
 export const bitrixDealConvert = (dealData: ManychatDealData): any => {
     const {
+        page_id,
         bitrix_id,
         profile_name,
         post_id,
@@ -145,8 +150,8 @@ export const bitrixDealConvert = (dealData: ManychatDealData): any => {
     } = dealData
 
     return {
-        [BitrixRelation.DEAL_TITLE]: profile_name + "Пост: " + post_id,
-        [BitrixRelation.DEAL_CATEGORY_ID]: BITRIX_CONST.DEAL_CATEGORY,
+        [BitrixRelation.DEAL_TITLE]: profile_name + " Пост: " + post_id,
+        [BitrixRelation.DEAL_CATEGORY_ID]: BITRIX_CONST.DEAL_CATEGORY[page_id],
         [BitrixRelation.DEAL_TYPE_ID]: BITRIX_CONST.DEAL_TYPE,
         [BitrixRelation.DEAL_CONTACT_ID]: bitrix_id,
         [BitrixRelation.DEAL_DELIVERY]: delivery,

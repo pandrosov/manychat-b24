@@ -7,14 +7,17 @@ import {MessageBuilder} from "../../helpers/manychat-messages";
 import {IButton} from "../../types/manychat/input/input";
 import * as dotenv from "dotenv";
 import {BITRIX_DEAL_STATUS, DEAL_WIN_STATUSES} from "../../helpers/constants";
+import {getDealFlow} from "../../helpers/helper";
 dotenv.config();
 
 export const dealRouter = Router({})
-dealRouter.get('/:id/all', async (req: RequestWithBodyAndParams<DealListParams, DealListReq>, res: Response) => {
+dealRouter.get('/:page_id/:id/all', async (req: RequestWithBodyAndParams<DealListParams, DealListReq>, res: Response) => {
     try {
         const id = req.params.id
+        const pageId = req.params.page_id
+        const buttonFlow = getDealFlow(pageId)
         const bitrix = new Bitrix24()
-        const dealButtonFlow = process.env.MANYCHAT_DEAL_BUTTON_FLOW || "content20240222162533_755256"
+        const dealButtonFlow = buttonFlow
         const query = {
             filter: {
                 ["=" + BitrixRelation.DEAL_CONTACT_ID]: id

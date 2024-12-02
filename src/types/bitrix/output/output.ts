@@ -12,4 +12,6 @@ export interface ConvertedBitrixContact {
     [BitrixRelation.CONTACT_CARD_NUMBER]: string,
     [BitrixRelation.CONTACT_TELEGRAM_ID]: string,
     [BitrixRelation.CONTACT_ASSIGNED_ID]: string | number
+    [BitrixRelation.CONTACT_DOB]: string,
+    [BitrixRelation.CONTACT_FIO_LATIN]: string
 }

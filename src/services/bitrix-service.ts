@@ -22,9 +22,9 @@ export class Bitrix24 {
     private readonly webhookUrlProd: string;
 
     constructor() {
-        this.webhookUrl = process.env.BITRIX_WEBHOOK_URL || '';
+        // this.webhookUrl = process.env.BITRIX_WEBHOOK_URL || '';
         this.webhookUrlProd = process.env.BITRIX_WEBHOOK_URL_PROD || '';
-        if (!this.webhookUrl) {
+        if (!this.webhookUrlProd) {
             throw new Error('Bitrix webhook URL not provided in environment variables');
         }
     }
@@ -101,7 +101,7 @@ export class Bitrix24 {
 
     async createDeal(dealData: ManychatDealData): Promise<DealCreatedResponse> {
         try {
-            const {bitrix_id, post_id, id: telegramId} = dealData
+            const {bitrix_id, post_id, id: telegramId, page_id: pageId} = dealData
             const filter = {
                 filter: {
                     ["=" + BitrixRelation.DEAL_POST_ID]: post_id,
@@ -110,9 +110,9 @@ export class Bitrix24 {
             }
             const dealsList = await this.getUserDeals(filter)
             const messageBuilder = new MessageBuilder();
-            const manyChat = new ManyChatService()
+            const manyChat = new ManyChatService(pageId)
             const {custom_fields} = await manyChat.getUserDataById(telegramId)
-            const bitrixActiveDeals = custom_fields.find(item => item.id === 10490344)?.value as Array<number | string> || [];
+            const bitrixActiveDeals = custom_fields.find(item => item.name === 'bitrix_active_deals')?.value as Array<number | string> || [];
 
             if (dealsList.total > 0) {
                 const messageJson = messageBuilder
@@ -171,32 +171,6 @@ export class Bitrix24 {
             return dealsResponse.data
         } catch (error) {
             throw error
-        }
-    }
-
-    async addEntityComment(type: string, id: number | string, comment: string): Promise<BitrixResponse> {
-        try {
-            const commentCreated = await axios.post(`${this.webhookUrlProd}crm.timeline.comment.add`, {
-                fields: {
-                    ENTITY_ID: id,
-                    ENTITY_TYPE: type,
-                    COMMENT: comment
-                }
-            })
-
-            return commentCreated.data.result
-        } catch (error) {
-            throw error
-        }
-    }
-
-    async updateDeal(contactId: number, updateData: ManychatUserData): Promise<void> {
-        try {
-            const response = await axios.post(`${this.webhookUrl}crm.deal.update`, {id: contactId, fields: updateData});
-            console.log('Contact updated:', response);
-        } catch (error) {
-            console.error('Error updating contact:', error);
-            throw error;
         }
     }
 }

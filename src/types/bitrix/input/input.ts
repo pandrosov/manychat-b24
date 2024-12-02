@@ -26,7 +26,8 @@ export interface RecordEntry {
 }
 
 export type DealListParams = {
-    id: number
+    id: number,
+    page_id: string
 }
 
 export type DealListReq = {
@@ -35,12 +36,14 @@ export type DealListReq = {
 
 export interface ManychatUserData {
     id: string;
+    page_id: string,
     phone: string,
     custom_fields: CustomFields;
 }
 
 export interface ManychatDealData {
     id: number,
+    page_id: string,
     bitrix_id: number,
     profile_name: string,
     post_id: string,
@@ -64,4 +67,6 @@ interface CustomFields {
     profile_address: string;
     profile_card: string;
     profile_socials: string;
+    profile_dob: string;
+    profile_fio_latin: string;
 }

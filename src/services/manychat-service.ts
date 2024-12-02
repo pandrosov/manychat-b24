@@ -6,15 +6,34 @@ import {ISetCustomFieldsData} from "../types/manychat/input/input";
 
 class ManyChatService {
     private axiosInstance: AxiosInstance;
+    private token: string | undefined;
 
-    constructor() {
+    constructor(pageId: string) {
+        this.token = this.getTokenForPage(pageId);
+        if(!this.token) {
+            throw new Error(`No token found for pageId: ${pageId}`)
+        }
         this.axiosInstance = axios.create({
             baseURL: 'https://api.manychat.com/fb/',
             headers: {
-                'Authorization': `Bearer ${process.env.MANYCHAT_TOKEN}`,
+                'Authorization': `Bearer ${this.token}`,
                 'Content-Type': 'application/json'
             }
         });
+    }
+
+    private getTokenForPage(pageId: string): string | undefined {
+        // Генерируем ключ для переменной окружения на основе pageId
+        const tokenEnv = `MANYCHAT_TOKEN_${pageId}`;
+
+        // Получаем токен из process.env и проверяем, что он существует
+        const token = process.env[tokenEnv];
+
+        if (!token) {
+            console.warn(`Token for pageId ${pageId} not found in environment variables.`);
+        }
+
+        return token;  // Возвращаем токен или undefined, если переменная не найдена
     }
 
     async getUserDataById(userId: number | string): Promise<ManyChatUserDataResponse> {

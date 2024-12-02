@@ -4,9 +4,9 @@ import {WebhookBody} from "../../types/webhook";
 import {Bitrix24} from "../../services/bitrix-service";
 import ManychatService from "../../services/manychat-service";
 import {BitrixRelation} from "../../types/bitrix/common";
-import {BITRIX_DEAL_STATUS, DEAL_WIN_STATUSES} from "../../helpers/constants";
+import {BITRIX_CONST, BITRIX_DEAL_STATUS, DEAL_WIN_STATUSES, WEBHOOK_CONST} from "../../helpers/constants";
 import * as dotenv from "dotenv";
-import ManyChatService from "../../services/manychat-service";
+import {getKeyByValue} from "../../helpers/helper";
 dotenv.config();
 
 export const webhookRouter = Router({})
@@ -77,7 +77,6 @@ export const webhookRouter = Router({})
 webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: Response) => {
     try {
         const bitrix = new Bitrix24()
-        const manyChat = new ManychatService()
         const {event, data: reqData, auth} = req.body
         const reqId = reqData.FIELDS.ID
 
@@ -86,8 +85,9 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
             case "ONCRMDEALDELETE": {
                 const deal = await bitrix.getDeal(reqId)
                 const {CATEGORY_ID: tunnelId, CONTACT_ID: bitrixId, STAGE_ID: status} = deal.result
-                if(tunnelId === "35") {
+                if(Object.values(BITRIX_CONST.DEAL_CATEGORY).includes(tunnelId)) {
                     const bitrixUser = await bitrix.getUserById(bitrixId)
+                    const manyChat = new ManychatService(WEBHOOK_CONST.TUNNEL_ID[tunnelId])
                     const manyChatUser = await manyChat.getUserDataById(bitrixUser.result[BitrixRelation.CONTACT_TELEGRAM_ID])
                     const {custom_fields} = manyChatUser
                     const bitrixActiveDeals = custom_fields.find(item => item.name === "bitrix_active_deals")?.value as Array<number | string> || [];
@@ -143,17 +143,19 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
                 // [+] - отправляем данные в мэничат
                 const deal = await bitrix.getDeal(reqId)
                 const {CATEGORY_ID: tunnelId, CONTACT_ID: bitrixId, STAGE_ID: status} = deal.result
-                if(tunnelId === "35") {
+                if(Object.values(BITRIX_CONST.DEAL_CATEGORY).includes(tunnelId)) {
                     const bitrixUser = await bitrix.getUserById(bitrixId)
+                    const manyChat = new ManychatService(WEBHOOK_CONST.TUNNEL_ID[tunnelId])
                     const manyChatUser = await manyChat.getUserDataById(bitrixUser.result[BitrixRelation.CONTACT_TELEGRAM_ID])
                     const {custom_fields} = manyChatUser
                     const bitrixActiveDeals = custom_fields.find(item => item.name === "bitrix_active_deals")?.value as Array<number | string> || [];
                     const bitrixClosedDeals = custom_fields.find(item => item.name === "bitrix_closed_deals")?.value as Array<number | string> || [];
                     let filteredActiveDeals: (string | number)[] = bitrixActiveDeals
                     let filteredClosedDeals: (string | number)[] = bitrixClosedDeals
+                    let dealStatus:string = status.split(":")[1]
 
                     // если сделка не имеет положительного статуса
-                    if(!DEAL_WIN_STATUSES.includes(status)) {
+                    if(!DEAL_WIN_STATUSES.includes(dealStatus)) {
                         if(filteredClosedDeals.includes(+reqId)) {
                             // то возвращаем closed в active
                             filteredClosedDeals = filteredClosedDeals.filter(item => {
@@ -216,7 +218,7 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
 
                 break;
             }
-            case "ONCRMCONTACTUPDATE":
+            case "ONCRMCONTACTUPDATE": {
                 // !TODO
                 // [+] - проверяем является ли контрагент амбассадором
                 // [+] - получаем все необходимые данные из битры
@@ -224,11 +226,15 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
                 // [+] - получаем идентификаторы кастомных полей
                 // [+] - формируем массив и отправляем исправленные данные в мэничат
                 const bitrixUser = await bitrix.getUserById(reqId)
-                if(bitrixUser.result[BitrixRelation.CONTACT_TYPE_ID] === "UC_2HCWL8") {
+                if (Object.values(BITRIX_CONST.CONTACT_TYPE).includes(bitrixUser.result[BitrixRelation.CONTACT_TYPE_ID])) {
                     const manyChatUserId = +bitrixUser.result[BitrixRelation.CONTACT_TELEGRAM_ID]
                     const socials = bitrixUser.result[BitrixRelation.CONTACT_SOCIALS].map(item => item.VALUE).join(',')
                     const address = `${bitrixUser.result[BitrixRelation.CONTACT_ADDRESS]}/${bitrixUser.result[BitrixRelation.CONTACT_OTH_ADDRESS]}`
-
+                    const pageId = getKeyByValue(BITRIX_CONST.CONTACT_TYPE, bitrixUser.result[BitrixRelation.CONTACT_TYPE_ID])
+                    if (!pageId) {
+                        throw new Error("pageId is undefined or not found in BITRIX_CONST.CONTACT_TYPE");
+                    }
+                    const manyChat = new ManychatService(pageId)
                     const updManyChatUser = await manyChat.setCustomFieldsForUser({
                         subscriber_id: manyChatUserId,
                         fields: [
@@ -266,6 +272,7 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
                     })
                 }
                 break;
+            }
         }
     } catch (error) {
         res.status(HTTP_CODES_RESPONSE.BAD_REQUEST).send({

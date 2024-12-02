@@ -16,28 +16,35 @@ export const bitrixValues: Mapping = {
 }
 
 export const BITRIX_DEAL_STATUS = {
-    todo: "C35:NEW",
-    prepare: "C35:PREPARATION",
-    payed: "C35:PREPAYMENT_INVOIC",
-    delivired: "C35:UC_931N70",
-    inReporting: "C35:EXECUTING",
-    checked: "C35:UC_UIJBGH",
-    success: "C35:WON",
-    failed: "C35:LOSE"
+    todo: "NEW",
+    success: "WON",
+    failed: "LOSE"
 }
 
 export const DEAL_WIN_STATUSES:string[] = [
-    BITRIX_DEAL_STATUS.checked,
     BITRIX_DEAL_STATUS.failed,
     BITRIX_DEAL_STATUS.success
 ]
 
 export const BITRIX_CONST = {
-    CONTACT_TYPE: "UC_2HCWL8",
+    CONTACT_TYPE: {
+        "170554202811478":"UC_2HCWL8",
+        "507065399154270": "UC_R3ZZDK"
+    } as Record<string, string>,
     CONTACT_ASSIGNED: 27377, // Gleb
     DEAL_ASSIGNED: 27377, // Gleb
     DEAL_TYPE: 1,
-    DEAL_CATEGORY: 35
+    DEAL_CATEGORY: {
+        "170554202811478":"35",
+        "507065399154270":"67"
+    } as Record<string,string>
+}
+
+export const WEBHOOK_CONST = {
+    TUNNEL_ID: {
+        35: "170554202811478",
+        67: "507065399154270"
+    } as Record<string, string>
 }
 
 export const bitrixIMArr: BitrixMultiplyField = {
