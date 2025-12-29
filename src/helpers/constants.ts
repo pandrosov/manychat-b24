@@ -12,7 +12,8 @@ export const bitrixValues: Mapping = {
     animal: "3707",
     ru: "3709",
     by: "3713",
-    kz: "3711"
+    kz: "3711",
+    oae: "5773"
 }
 
 export const BITRIX_DEAL_STATUS = {
