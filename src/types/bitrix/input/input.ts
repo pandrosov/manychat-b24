@@ -69,4 +69,6 @@ interface CustomFields {
     profile_socials: string;
     profile_dob: string;
     profile_fio_latin: string;
+    profile_name_en: string;
+    shipping_method: string;
 }

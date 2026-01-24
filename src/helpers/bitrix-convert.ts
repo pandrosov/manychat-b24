@@ -69,6 +69,8 @@ export const bitrixContactConvert = (inputData: ManychatUserData): ConvertedBitr
         profile_card,
         profile_dob,
         profile_fio_latin,
+        profile_name_en,
+        shipping_method,
         bitrix_user_category,
         bitrix_user_region
     } = inputData.custom_fields
@@ -82,6 +84,8 @@ export const bitrixContactConvert = (inputData: ManychatUserData): ConvertedBitr
         [BitrixRelation.CONTACT_PHONE]: phone,
         [BitrixRelation.CONTACT_DOB]: profile_dob,
         [BitrixRelation.CONTACT_FIO_LATIN]: profile_fio_latin ?? "",
+        [BitrixRelation.CONTACT_NAME_EN]: profile_name_en ?? "",
+        [BitrixRelation.CONTACT_SHIPPING_METHOD]: shipping_method ?? "",
         [BitrixRelation.CONTACT_ADDRESS]: fact_address ? fact_address : profile_address,
         [BitrixRelation.CONTACT_OTH_ADDRESS]: pvz_address ? pvz_address : "",
         [BitrixRelation.CONTACT_CATEGORY]: bitrixValues[bitrix_user_category],

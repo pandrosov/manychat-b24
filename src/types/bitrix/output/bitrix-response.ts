@@ -217,6 +217,9 @@ interface UserProfileResult {
     UF_CRM_1706525214126: string;
     UF_CRM_1706525298377: string;
     UF_CRM_1706525810567: string;
+    UF_CRM_1731924687: string;
+    UF_CRM_1769097575075: string;
+    UF_CRM_1769097592716: string;
     UF_CRM_65C4BB12F1355: string;
     UF_CRM_CONT_UID: string;
     PHONE: BitrixMultiplyField[];

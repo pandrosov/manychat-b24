@@ -253,6 +253,14 @@ webhookRouter.post('/RtOpE49ZjE', async(req: RequestWithBody<WebhookBody>, res: 
                             {
                                 field_name: 'profile_card',
                                 field_value: bitrixUser.result[BitrixRelation.CONTACT_CARD_NUMBER]
+                            },
+                            {
+                                field_name: 'profile_name_en',
+                                field_value: bitrixUser.result[BitrixRelation.CONTACT_NAME_EN]
+                            },
+                            {
+                                field_name: 'shipping_method',
+                                field_value: bitrixUser.result[BitrixRelation.CONTACT_SHIPPING_METHOD]
                             }
                         ]
                     })
