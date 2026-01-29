@@ -32,8 +32,8 @@ export const BITRIX_CONST = {
         "170554202811478":"UC_2HCWL8",
         "507065399154270": "UC_R3ZZDK"
     } as Record<string, string>,
-    CONTACT_ASSIGNED: 27377, // Gleb
-    DEAL_ASSIGNED: 27377, // Gleb
+    CONTACT_ASSIGNED: 29567, // Gleb
+    DEAL_ASSIGNED: 29567, // Gleb
     DEAL_TYPE: 1,
     DEAL_CATEGORY: {
         "170554202811478":"35",
